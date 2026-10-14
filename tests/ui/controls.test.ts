@@ -86,4 +86,101 @@ describe('createSlider', () => {
       [0.4, true],
     ]);
   });
+  const pe = (type: string, init: { clientX?: number; pointerId?: number; button?: number } = {}) =>
+    Object.assign(new MouseEvent(type, { clientX: init.clientX ?? 0, button: init.button ?? 0, bubbles: true }), {
+      pointerId: init.pointerId,
+    });
+  const trackDrags = () => {
+    const drags: boolean[] = [];
+    ui.events.on('ui:drag', (d: { active: boolean }) => drags.push(d.active));
+    return drags;
+  };
+
+  it('ignores a second pointer while dragging and only follows the active pointer', () => {
+    const drags = trackDrags();
+    const onInput = vi.fn();
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput });
+    rect(s.el, 0, 100);
+    s.el.dispatchEvent(pe('pointerdown', { pointerId: 1, clientX: 10 }));
+    s.el.dispatchEvent(pe('pointerdown', { pointerId: 2, clientX: 90 }));
+    s.el.dispatchEvent(pe('pointermove', { pointerId: 2, clientX: 80 }));
+    s.el.dispatchEvent(pe('pointerup', { pointerId: 2, clientX: 80 }));
+    expect(drags).toEqual([true]);
+    s.el.dispatchEvent(pe('pointerup', { pointerId: 1, clientX: 20 }));
+    expect(drags).toEqual([true, false]);
+    expect(onInput.mock.calls).toEqual([
+      [0.1, false],
+      [0.2, true],
+    ]);
+  });
+
+  it('dispose ends an active drag without calling onInput', () => {
+    const drags = trackDrags();
+    const onInput = vi.fn();
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput });
+    rect(s.el, 0, 100);
+    s.el.dispatchEvent(pe('pointerdown', { clientX: 10 }));
+    onInput.mockClear();
+    s.dispose();
+    expect(drags).toEqual([true, false]);
+    expect(onInput).not.toHaveBeenCalled();
+    s.dispose();
+    expect(drags).toEqual([true, false]);
+  });
+
+  it('lostpointercapture ends the drag once with the last value', () => {
+    const drags = trackDrags();
+    const onInput = vi.fn();
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput });
+    rect(s.el, 0, 100);
+    s.el.dispatchEvent(pe('pointerdown', { clientX: 10 }));
+    s.el.dispatchEvent(pe('pointermove', { clientX: 40 }));
+    s.el.dispatchEvent(pe('lostpointercapture'));
+    expect(drags).toEqual([true, false]);
+    expect(onInput.mock.calls).toEqual([
+      [0.1, false],
+      [0.4, false],
+      [0.4, true],
+    ]);
+    s.el.dispatchEvent(pe('pointerup', { clientX: 90 }));
+    s.el.dispatchEvent(pe('lostpointercapture'));
+    expect(onInput).toHaveBeenCalledTimes(3);
+    expect(drags).toEqual([true, false]);
+  });
+
+  it('pointerup followed by lostpointercapture does not emit final twice', () => {
+    const onInput = vi.fn();
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput });
+    rect(s.el, 0, 100);
+    s.el.dispatchEvent(pe('pointerdown', { clientX: 10 }));
+    s.el.dispatchEvent(pe('pointerup', { clientX: 50 }));
+    s.el.dispatchEvent(pe('lostpointercapture'));
+    expect(onInput.mock.calls.filter((c) => c[1] === true)).toHaveLength(1);
+  });
+
+  it('keyboard keys are default-prevented but still bubble to ancestors', () => {
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput: () => {} });
+    const parent = document.createElement('div');
+    parent.append(s.el);
+    const seen = vi.fn();
+    parent.addEventListener('keydown', seen);
+    const ev = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true });
+    s.el.dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+    expect(seen).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores non-primary mouse buttons', () => {
+    const drags = trackDrags();
+    const onInput = vi.fn();
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput });
+    s.el.dispatchEvent(pe('pointerdown', { button: 2, clientX: 10 }));
+    expect(onInput).not.toHaveBeenCalled();
+    expect(drags).toEqual([]);
+  });
+
+  it('exposes aria-valuenow immediately', () => {
+    const s = createSlider(ctx, { className: 'vp-volume', label: 'v', onInput: () => {} });
+    expect(s.el.getAttribute('aria-valuenow')).toBe('0');
+  });
 });

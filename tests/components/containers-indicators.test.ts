@@ -57,7 +57,8 @@ describe('indicators', () => {
     expect(title.textContent).toBe('Hello');
     const buffering = build({ type: 'buffering' });
     expect(buffering.getAttribute('role')).toBe('status');
-    expect(buffering.getAttribute('aria-label')).toBe('Загрузка');
+    expect(buffering.hasAttribute('aria-label')).toBe(false);
+    expect(buffering.querySelector('.vp-sr-only')!.textContent).toBe('Загрузка');
     expect(build({ type: 'live' }).textContent).toContain('LIVE');
   });
 
@@ -93,6 +94,17 @@ describe('indicators', () => {
     expect(toggle).not.toHaveBeenCalled();
     ui.store.set({ userActive: true });
     el.dispatchEvent(Object.assign(new Event('pointerdown', { bubbles: true }), { pointerType: 'touch' }));
+    el.click();
+    expect(toggle).toHaveBeenCalledTimes(1);
+  });
+
+  it('pointercancel resets the reveal-only state', () => {
+    const toggle = vi.fn();
+    ui.commands.register('toggle', toggle);
+    ui.store.set({ started: true, status: 'playing', userActive: false });
+    const el = build({ type: 'media-click-layer' });
+    el.dispatchEvent(Object.assign(new Event('pointerdown', { bubbles: true }), { pointerType: 'touch' }));
+    el.dispatchEvent(new Event('pointercancel', { bubbles: true }));
     el.click();
     expect(toggle).toHaveBeenCalledTimes(1);
   });

@@ -21,7 +21,7 @@ export const titleComponent: ComponentFactory = (ctx) => {
 };
 
 export const bufferingComponent: ComponentFactory = (ctx) => ({
-  el: h('div', { class: 'vp-buffering', role: 'status', 'aria-label': ctx.t('buffering') }),
+  el: h('div', { class: 'vp-buffering', role: 'status' }, h('span', { class: 'vp-sr-only' }, ctx.t('buffering'))),
 });
 
 export const liveComponent: ComponentFactory = (ctx) => ({
@@ -52,11 +52,13 @@ export const mediaClickLayerComponent: ComponentFactory = (ctx) => {
     const s = ctx.store.get();
     revealOnly = (e as PointerEvent).pointerType === 'touch' && s.status === 'playing' && !s.userActive;
   });
+  ctx.listen(el, 'pointercancel', () => {
+    revealOnly = false;
+  });
   ctx.listen(el, 'click', () => {
-    if (revealOnly) {
-      revealOnly = false;
-      return;
-    }
+    const reveal = revealOnly;
+    revealOnly = false;
+    if (reveal) return;
     ctx.user('toggle');
   });
   ctx.listen(el, 'dblclick', () => ctx.user('toggleFullscreen'));
