@@ -413,3 +413,33 @@
 }
 
 /* ===== Plugins (appended in chunk 7) ===== */
+
+/* subtitles */
+.vp-subtitles {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 6%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none !important;
+  transition: bottom 0.25s ease;
+}
+.vp-subtitles.vp-subtitles-raised {
+  bottom: calc(6% + 56px);
+}
+.vp-subtitles-text {
+  max-width: 100%;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  background: var(--vp-sub-bg);
+  color: var(--vp-sub-color);
+  font-size: var(--vp-sub-size);
+  line-height: 1.35;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.vp-subtitles-text:empty {
+  display: none;
+}
