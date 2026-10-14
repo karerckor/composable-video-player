@@ -27,6 +27,16 @@ describe('default layout', () => {
     expect(el.querySelector('.vp-settings')!.classList.contains('vp-hidden')).toBe(true);
   });
 
+  it('hides big-play when the player is in error', () => {
+    const ui = createUIHarness();
+    registerBuiltinComponents(ui.components);
+    const el = ui.engine.build(defaultLayout, ui.root)!.el;
+    const bigPlay = el.querySelector('.vp-big-play')!;
+    expect(bigPlay.classList.contains('vp-hidden')).toBe(false);
+    ui.store.set({ status: 'error' });
+    expect(bigPlay.classList.contains('vp-hidden')).toBe(true);
+  });
+
   it('lists every built-in type', () => {
     expect(Object.keys(BUILTIN_COMPONENTS).sort()).toEqual(
       ['big-play', 'buffering', 'duration', 'error-overlay', 'fullscreen', 'group', 'live', 'media-click-layer', 'mute', 'overlay', 'play', 'root', 'settings', 'spacer', 'text', 'time', 'timeline', 'title', 'toolbar', 'volume'].sort(),

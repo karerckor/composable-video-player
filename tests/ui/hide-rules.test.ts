@@ -52,6 +52,8 @@ describe('built-in hide rules', () => {
     expect(test(['live'], state({ live: true }))).toBe(true);
     expect(test(['not-live'], state())).toBe(true);
     expect(test(['not-error'], state({ status: 'error' }))).toBe(false);
+    expect(test(['error'], state({ status: 'error' }))).toBe(true);
+    expect(test(['error'], state())).toBe(false);
   });
 
   it('width rules', () => {

@@ -55,9 +55,40 @@ describe('mute', () => {
 
   it('changes volume with the wheel', () => {
     const el = build('mute');
-    el.dispatchEvent(new WheelEvent('wheel', { deltaY: -10, cancelable: true }));
-    el.dispatchEvent(new WheelEvent('wheel', { deltaY: 10, cancelable: true }));
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: -60, cancelable: true }));
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: 60, cancelable: true }));
     expect(calls).toEqual([['setVolume', ['+0.05']], ['setVolume', ['-0.05']]]);
+  });
+
+  it('ignores wheel events with deltaY 0 and accumulates small deltas into one step', () => {
+    const el = build('mute');
+    const zero = new WheelEvent('wheel', { deltaY: 0, deltaX: 30, cancelable: true });
+    el.dispatchEvent(zero);
+    expect(zero.defaultPrevented).toBe(false);
+    expect(calls).toEqual([]);
+    for (let i = 0; i < 5; i++) {
+      const e = new WheelEvent('wheel', { deltaY: -10, cancelable: true });
+      el.dispatchEvent(e);
+      expect(e.defaultPrevented).toBe(true);
+    }
+    expect(calls).toEqual([['setVolume', ['+0.05']]]);
+  });
+
+  it('normalizes line-based deltas', () => {
+    const el = build('mute');
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: -4, deltaMode: 1, cancelable: true }));
+    expect(calls).toEqual([['setVolume', ['+0.05']]]);
+  });
+
+  it('ignores downward steps while muted but still prevents default', () => {
+    const el = build('mute');
+    ui.store.set({ muted: true });
+    const down = new WheelEvent('wheel', { deltaY: 60, cancelable: true });
+    el.dispatchEvent(down);
+    expect(down.defaultPrevented).toBe(true);
+    expect(calls).toEqual([]);
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: -60, cancelable: true }));
+    expect(calls).toEqual([['setVolume', ['+0.05']]]);
   });
 });
 
@@ -96,6 +127,13 @@ describe('volume', () => {
     el.dispatchEvent(new MouseEvent('pointerup', { clientX: 30 }));
     expect(calls).toEqual([['setVolume', [0.3]], ['setVolume', [0.3]]]);
   });
+  it('changes volume with the wheel', () => {
+    const el = build('volume');
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: -60, cancelable: true }));
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: 60, cancelable: true }));
+    expect(calls).toEqual([['setVolume', ['+0.05']], ['setVolume', ['-0.05']]]);
+  });
+
   it('dispose ends an active drag', () => {
     const drags: boolean[] = [];
     ui.events.on('ui:drag', ({ active }) => drags.push(active));

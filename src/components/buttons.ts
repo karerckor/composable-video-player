@@ -1,5 +1,6 @@
 import type { ComponentFactory, IconName } from '../types';
 import { createIconButton } from '../ui/button';
+import { bindWheelVolume } from '../ui/wheel';
 
 export const playComponent: ComponentFactory = (ctx) => {
   const b = createIconButton(ctx, 'vp-play', () => ctx.user('toggle'));
@@ -31,15 +32,7 @@ export const muteComponent: ComponentFactory = (ctx) => {
   );
   // The label describes what a click does (toggleMute), so it follows `muted`, not the level.
   ctx.select((s) => s.muted, (muted) => b.setLabel(muted ? 'unmute' : 'mute'), { immediate: true });
-  ctx.listen(
-    b.el,
-    'wheel',
-    (e) => {
-      e.preventDefault();
-      ctx.user('setVolume', (e as WheelEvent).deltaY < 0 ? '+0.05' : '-0.05');
-    },
-    { passive: false },
-  );
+  bindWheelVolume(ctx, b.el);
   return { el: b.el };
 };
 

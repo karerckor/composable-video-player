@@ -14,6 +14,7 @@ export function registerBuiltinHideRules(reg: Registry<HideRuleFactory>): void {
   reg.register('not-waiting', simple((s) => !s.waiting));
   reg.register('live', simple((s) => s.live));
   reg.register('not-live', simple((s) => !s.live));
+  reg.register('error', simple((s) => s.status === 'error'));
   reg.register('not-error', simple((s) => s.status !== 'error'));
   reg.register('minWidth', (arg) => {
     const n = Number(arg);

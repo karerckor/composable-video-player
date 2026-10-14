@@ -10,7 +10,7 @@ export const defaultLayout: LayoutNode = {
       children: [
         { type: 'title', anchor: 'top-left', hide: ['idle'] },
         { type: 'buffering', anchor: 'center', hide: ['not-waiting'] },
-        { type: 'big-play', anchor: 'center', hide: ['started'] },
+        { type: 'big-play', anchor: 'center', hide: ['started', 'error'] },
         { type: 'error-overlay', anchor: 'center', hide: ['not-error'] },
       ],
     },

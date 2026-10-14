@@ -45,6 +45,10 @@
 .vp-root.vp-idle {
   cursor: none;
 }
+.vp-root:focus-visible {
+  outline: 2px solid var(--vp-color-1);
+  outline-offset: -2px;
+}
 
 /* ===== Layers ===== */
 .vp-media,
@@ -77,6 +81,10 @@
 }
 .vp-click-layer {
   cursor: pointer;
+}
+
+.vp-ui {
+  font-size: var(--vp-font-size);
 }
 
 /* ===== Visibility ===== */
@@ -387,7 +395,7 @@
     --vp-font-size: 13px;
   }
   .vp-toolbar {
-    padding: 18px 4px 2px;
+    padding: 18px 8px 2px;
   }
 }
 
