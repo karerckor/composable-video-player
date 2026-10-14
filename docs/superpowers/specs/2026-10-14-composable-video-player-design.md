@@ -487,7 +487,7 @@ interface ComponentInstance { el: HTMLElement; slot?: HTMLElement; dispose?(): v
 interface UIContext {
   player: Player;
   store: Store<PlayerState>; events: EventBus; commands: CommandRegistry;
-  options: PlayerOptions; container: HTMLElement; log: Logger;
+  options: PlayerOptions; root: HTMLElement; log: Logger;   // root = .vp-root
   t(key: string): string; icon(name: IconName): string;
   menus: MenuHost;
   build(node: LayoutNode): ComponentInstance | null;   // для контейнеров
