@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMenuHost } from '../../src/ui/menu-host';
 import { createStore } from '../../src/core/store';
 import { createEventBus } from '../../src/core/events';
@@ -180,5 +180,76 @@ describe('MenuHost', () => {
     (document.activeElement as HTMLElement).blur();
     key('ArrowDown');
     expect(document.activeElement).toBe(items()[0]);
+  });
+});
+
+describe('MenuHost outside-click dismissal', () => {
+  let root: HTMLElement;
+  let clickLayer: HTMLElement;
+  let outside: HTMLElement;
+  let clicks: string[];
+
+  const press = (el: Element) => el.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+  const click = (el: Element) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    document.body.replaceChildren();
+    root = document.createElement('div');
+    root.className = 'vp-root';
+    layer = document.createElement('div');
+    clickLayer = document.createElement('div');
+    root.append(clickLayer, layer);
+    outside = document.createElement('div');
+    document.body.append(root, outside);
+    clicks = [];
+    clickLayer.addEventListener('click', () => clicks.push('layer'));
+    outside.addEventListener('click', () => clicks.push('outside'));
+    const events = createEventBus();
+    menus = createMenuHost({ layer, store, events, t: createTranslator('ru'), icon: createIconSet(), log: createLogger(false) });
+    menus.register(speedMenu());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('swallows the click that follows a dismissal inside the same player', () => {
+    menus.open();
+    press(clickLayer);
+    click(clickLayer);
+    expect(menus.isOpen).toBe(false);
+    expect(clicks).toEqual([]);
+  });
+
+  it('does not swallow clicks outside the player', () => {
+    menus.open();
+    press(outside);
+    click(outside);
+    expect(menus.isOpen).toBe(false);
+    expect(clicks).toEqual(['outside']);
+  });
+
+  it('lets a later click inside the player through after a swallowed dismissal', () => {
+    menus.open();
+    press(clickLayer);
+    click(clickLayer);
+    press(clickLayer);
+    click(clickLayer);
+    expect(clicks).toEqual(['layer']);
+  });
+
+  it('stops swallowing after a timeout and on dispose', () => {
+    menus.open();
+    press(clickLayer);
+    vi.advanceTimersByTime(700);
+    click(clickLayer);
+    expect(clicks).toEqual(['layer']);
+
+    menus.open();
+    press(clickLayer);
+    menus.dispose();
+    click(clickLayer);
+    expect(clicks).toEqual(['layer', 'layer']);
   });
 });

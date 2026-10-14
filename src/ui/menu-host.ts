@@ -119,10 +119,34 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
     }
   };
 
+  let cancelSwallow: (() => void) | null = null;
+
+  /** Eats the click that completes a dismissing press, so it doesn't also hit the player (e.g. toggle playback). */
+  const swallowNextClick = () => {
+    cancelSwallow?.();
+    const onClick = (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
+      cancelSwallow?.();
+    };
+    const timer = setTimeout(() => cancelSwallow?.(), 600);
+    cancelSwallow = () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', onClick, true);
+      document.removeEventListener('pointerdown', cancelSwallow!, true);
+      cancelSwallow = null;
+    };
+    document.addEventListener('click', onClick, true);
+    document.addEventListener('pointerdown', cancelSwallow, true);
+  };
+
   const onOutside = (e: Event) => {
     const target = e.target as Element | null;
     if (!panel || (target && (panel.contains(target) || target.closest?.('[data-vp-menu-toggle]')))) return;
+    const playerRoot = d.layer.closest('.vp-root') ?? d.layer.parentElement;
+    const inPlayer = !!(target && playerRoot?.contains(target));
     host.close();
+    if (inPlayer) swallowNextClick();
   };
 
   const onKey = (e: KeyboardEvent) => {
@@ -200,6 +224,7 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
 
     dispose() {
       host.close();
+      cancelSwallow?.();
       defs.length = 0;
     },
   };

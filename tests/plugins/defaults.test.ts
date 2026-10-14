@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultPlugins } from '../../src/plugins';
 import { createPlayer } from '../../src/create-player';
 import { createPlayerCore } from '../../src/player';
+import { speedPlugin } from '../../src/plugins/speed';
 import * as vp from '../../src/index';
 import { createTestPlayer } from '../helpers/player-harness';
 import { flush } from '../helpers/flush';
@@ -47,6 +48,24 @@ describe('defaultPlugins', () => {
     player.root.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyM', bubbles: true, cancelable: true }));
     expect(player.state.muted).toBe(true);
     expect(localStorage.getItem('vp:muted')).toBe('1');
+  });
+
+  it('dismissing the settings menu by clicking the video does not toggle playback', async () => {
+    const { player, host } = createTestPlayer({ plugins: [speedPlugin()] });
+    player.load('movie.mp4');
+    await flush();
+    player.command('play');
+    await flush();
+    expect(player.state.status).toBe('playing');
+    host.querySelector<HTMLButtonElement>('.vp-settings')!.click();
+    expect(host.querySelector('.vp-menu')).not.toBeNull();
+    const layer = host.querySelector<HTMLElement>('.vp-click-layer')!;
+    layer.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    layer.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flush();
+    expect(host.querySelector('.vp-menu')).toBeNull();
+    expect(player.state.status).toBe('playing');
+    player.destroy();
   });
 
   it('exports plugin factories from the public entry', () => {
