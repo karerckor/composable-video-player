@@ -52,6 +52,8 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
       let itemThumbs = false;
       /** True while the plugin itself issues `load`, so the before-hook can tell it from a direct load. */
       let internal = false;
+      /** The exact input `playIndex` last passed to `load`; `reload` replays it and must not drop the playlist. */
+      let lastItemInput: SourceSpecInput | null = null;
       /** Bumped by every navigation or direct load; deferred steps (autonext) check it before running. */
       let epoch = 0;
       let cancelPlay: (() => void) | null = null;
@@ -104,6 +106,7 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
         const start = startTime ?? spec.start;
         if (start !== undefined) input.start = start;
         else delete input.start;
+        lastItemInput = input;
         internal = true;
         try {
           ctx.commands.run('load', [input]);
@@ -190,7 +193,7 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
 
         ctx.commands.before('load', ([input]) => {
           if (!isPlaylistInput(input)) {
-            if (internal) return;
+            if (internal || input === lastItemInput) return;
             // A direct load supersedes a playlist that is still loading, and makes the current one stale.
             request++;
             epoch++;

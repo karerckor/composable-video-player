@@ -297,4 +297,17 @@ describe('playlistPlugin review fixes', () => {
     await flush();
     expect(b.fp.loads).toHaveLength(0);
   });
+
+  it('keeps the playlist across reload (error-overlay retry)', async () => {
+    const { player, fp } = await setup();
+    player.command('playItem', 1, false);
+    await flush();
+    const before = fp.loads.length;
+    player.command('reload');
+    await flush();
+    expect(fp.loads).toHaveLength(before + 1);
+    expect(fp.loads[fp.loads.length - 1]!.url).toBe('two.mp4');
+    expect(player.state.playlist).toBeDefined();
+    expect(player.state.playlist!.index).toBe(1);
+  });
 });
