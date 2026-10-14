@@ -1,5 +1,6 @@
 import { createIconButton, createPlayer, defaultLayout, defaultPlugins, type LayoutNode, type Player, type Plugin } from '../src/index.js';
 import { setupCustomization } from './customization.js';
+import { setupPluginExamples } from './plugin-examples.js';
 
 const both = (name: string) => `assets/${name}.webm or assets/${name}.mp4`;
 const players: Record<string, Player> = {};
@@ -89,6 +90,9 @@ track('error', createPlayer({ container: 'p-error', source: 'assets/missing.mp4'
 
 // 7–8. Layout gallery and theme builder
 setupCustomization(track);
+
+// 9. Example plugins: timecodes and share with a timestamp
+setupPluginExamples(track);
 
 function structuredCloneLayout(node: LayoutNode): LayoutNode {
   return JSON.parse(JSON.stringify(node)) as LayoutNode;

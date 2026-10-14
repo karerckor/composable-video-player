@@ -26,6 +26,17 @@
       /* Layout node classNames: two classes so they win over the player's injected styles. */
       .vp-root .demo-pill { gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); }
       .vp-root .demo-solid-bar { padding: 4px 8px; }
+      /* Example plugins: styled with the player's theme variables. */
+      .vp-root .demo-chapter-title { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
+      .vp-root .demo-share-panel { position: absolute; right: 12px; bottom: 64px; width: min(340px, calc(100% - 24px)); display: grid; gap: 10px; padding: 12px; border-radius: var(--vp-radius); background: var(--vp-color-3); color: var(--vp-color-2); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); }
+      .vp-root .demo-share-title { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+      .vp-root .demo-share-url { width: 100%; padding: 6px 8px; border: 1px solid color-mix(in srgb, var(--vp-color-2) 25%, transparent); border-radius: var(--vp-radius); background: transparent; color: inherit; font: inherit; user-select: text; -webkit-user-select: text; }
+      .vp-root .demo-share-panel label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+      .vp-root .demo-share-copy { justify-self: start; padding: 6px 14px; background: var(--vp-color-1); color: #fff; }
+      #timecodes { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 14px; }
+      #timecodes li { padding: 2px 6px; border-radius: 4px; }
+      #timecodes li.current { background: #dbeafe; }
+      #timecodes a { color: #2563eb; font-variant-numeric: tabular-nums; }
     </style>
   </head>
   <body>
@@ -122,6 +133,17 @@
             <pre id="theme-code"></pre>
           </div>
         </div>
+      </section>
+
+      <section>
+        <h2>9. Example plugins: timecodes and share with a timestamp</h2>
+        <p>
+          Both live in <code>demo/plugins/</code> and use only the public API. <b>Timecodes</b>: <code>timecodes</code> option in YouTube description format →
+          gaps on the timeline, chapter name on hover and in the toolbar, a «Главы» submenu in settings. <b>Share</b>: the arrow button opens a panel with
+          the link and «Начать с 0:12»; opening <a href="?t=16">?t=16</a> starts this player at 0:16.
+        </p>
+        <div id="p-plugins"></div>
+        <ul id="timecodes"></ul>
       </section>
 
       <p><a href="./compat.html">PlayerJS compat page (UMD bundle) →</a></p>

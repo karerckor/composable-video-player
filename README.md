@@ -41,9 +41,9 @@ PlayerJS-style:
 ## Concepts
 
 - **Source syntax** — `[Label]url` qualities, `{Label}url;…` audio tracks, `a or b` fallback, `a and b` random, `(subtitle:[En]url)`, `url[seek:10]`, JSON/URL playlists.
-- **Plugins** — `defaultPlugins()`: quality, speed, audio tracks, subtitles, thumbnails, playlist, hotkeys, memory, autoplay, media session. A plugin is `{ name, setup(ctx) }` and can register providers, components, menus, hide rules, commands, source transforms and layers.
-- **Layout** — JSON tree of component types with shared props (`hint`, `scale`, `margin`, `anchor`, `hide`, `action`, …). Start from `defaultLayout`.
-- **Theme** — CSS custom properties (`--vp-color-1..3`, `--vp-toolbar-bg`, …) or the `theme` option.
+- **Plugins** — `defaultPlugins()`: quality, speed, audio tracks, subtitles, thumbnails, playlist, hotkeys, memory, autoplay, media session. A plugin is `{ name, setup(ctx) }` and can register providers, components, menus, hide rules, commands, source transforms and layers. Setting `state.markers` draws ticks on the timeline. Worked examples using only the public API: `demo/plugins/timecodes.ts` (chapters) and `demo/plugins/share.ts` (share link with `?t=` start time).
+- **Layout** — JSON tree of component types with shared props (`hint`, `scale`, `margin`, `anchor`, `hide`, `action`, …). Start from `defaultLayout`; `layout: false` gives a headless player. See the gallery in `demo/customization.ts`.
+- **Theme** — CSS custom properties (`--vp-color-1..3`, `--vp-toolbar-bg`, …) or the `theme` option; translucent tints derive from `color2`/`color3`, so light themes work. The demo has a live theme builder.
 
 ## Development
 
