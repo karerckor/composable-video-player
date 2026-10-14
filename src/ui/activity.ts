@@ -12,6 +12,7 @@ export interface UserActivity {
   dispose(): void;
 }
 
+const MAX_TIMEOUT = 2_147_483_647;
 const ACTIVATE = ['pointermove', 'pointerdown', 'keydown', 'focusin'] as const;
 
 /** Mirrors the default toolbar hide rule [idle] (toolbar is visible before the first play, like PlayerJS). */
@@ -20,6 +21,8 @@ export const controlsVisible = (s: PlayerState) => s.userActive || s.status !== 
 export function createUserActivity(d: UserActivityDeps): UserActivity {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let holds = 0;
+  // setTimeout overflows (fires immediately) above 2^31-1 ms; a non-finite timeout means "never hide".
+  const canSchedule = Number.isFinite(d.timeout) && d.timeout <= MAX_TIMEOUT;
 
   const setActive = (active: boolean) => {
     if (d.store.get().userActive !== active) d.store.set({ userActive: active });
@@ -28,7 +31,7 @@ export function createUserActivity(d: UserActivityDeps): UserActivity {
   const poke = () => {
     clearTimeout(timer);
     setActive(true);
-    if (holds === 0) timer = setTimeout(() => setActive(false), d.timeout);
+    if (holds === 0 && canSchedule) timer = setTimeout(() => setActive(false), d.timeout);
   };
 
   const onLeave = (e: Event) => {

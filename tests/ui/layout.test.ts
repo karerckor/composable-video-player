@@ -110,4 +110,39 @@ describe('LayoutEngine', () => {
     expect(m.el.querySelectorAll('.box')).toHaveLength(1);
     expect(console.error).toHaveBeenCalled();
   });
+
+  it('isolates a component whose hide rule throws', () => {
+    ui.hideRules.register('boom', () => {
+      throw new Error('rule');
+    });
+    const disposeBad = vi.fn();
+    ui.components.register('bad2', () => ({ el: h('div', { class: 'bad2' }), dispose: disposeBad }));
+    const m = ui.engine.build(
+      { type: 'container', children: [{ type: 'bad2', hide: ['boom'] }, { type: 'box' }] },
+      ui.root,
+    )!;
+    expect(m.el.querySelectorAll('.box')).toHaveLength(1);
+    expect(m.el.querySelectorAll('.bad2')).toHaveLength(0);
+    expect(disposeBad).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  it('disposes children before the parent and detaches the parent first', () => {
+    const order: string[] = [];
+    let parentEl!: HTMLElement;
+    ui.components.register('parent', () => {
+      const el = h('div');
+      const slot = h('div');
+      el.append(slot);
+      parentEl = el;
+      return {
+        el,
+        slot,
+        dispose: () => order.push(`parent(connected=${ui.root.contains(parentEl)})`),
+      };
+    });
+    ui.components.register('child', () => ({ el: h('div'), dispose: () => order.push('child') }));
+    ui.engine.build({ type: 'parent', children: [{ type: 'child' }] }, ui.root)!.dispose();
+    expect(order).toEqual(['child', 'parent(connected=false)']);
+  });
 });

@@ -146,4 +146,39 @@ describe('MenuHost', () => {
     off();
     expect(menus.hasVisible(store.get())).toBe(false);
   });
+
+  it('keeps focus inside the panel when it re-renders', () => {
+    menus.register(speedMenu());
+    menus.open();
+    items()[1]!.focus();
+    store.set({ rate: 2 });
+    const active = document.activeElement as HTMLElement;
+    expect(active.tagName).toBe('BUTTON');
+    expect(active.closest('.vp-menu')).not.toBeNull();
+    expect(items().indexOf(active as HTMLButtonElement)).toBe(1);
+  });
+
+  it('restores focus to the previously focused element on close', () => {
+    menus.register(speedMenu());
+    const toggle = document.createElement('button');
+    document.body.append(toggle);
+    toggle.focus();
+    menus.open();
+    expect(document.activeElement).not.toBe(toggle);
+    layer.querySelector('.vp-menu')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('ArrowUp/ArrowDown without a focused item go to the last/first item', () => {
+    menus.register(speedMenu());
+    menus.open();
+    const key = (k: string) =>
+      layer.querySelector('.vp-menu')!.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+    (document.activeElement as HTMLElement).blur();
+    key('ArrowUp');
+    expect(document.activeElement).toBe(items()[2]);
+    (document.activeElement as HTMLElement).blur();
+    key('ArrowDown');
+    expect(document.activeElement).toBe(items()[0]);
+  });
 });

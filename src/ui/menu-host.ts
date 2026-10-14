@@ -18,6 +18,7 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
   let opts: OpenOptions = {};
   let view: string | null = null;
   let unsubscribe: (() => void) | null = null;
+  let previousFocus: HTMLElement | null = null;
 
   const visibleDefs = (s: PlayerState) =>
     defs
@@ -56,6 +57,10 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
     if (view === null && list.length === 1) view = list[0]!.id;
     const def = view ? list.find((x) => x.id === view) : undefined;
     if (view && !def) view = null;
+
+    // Re-rendering replaces the buttons: remember which one had focus so keyboard users keep their place.
+    const hadFocus = panel.contains(document.activeElement);
+    const focusIndex = hadFocus ? [...panel.querySelectorAll('button')].indexOf(document.activeElement as HTMLButtonElement) : -1;
 
     panel.replaceChildren();
     if (def) {
@@ -107,6 +112,11 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
         panel.append(item);
       }
     }
+
+    if (hadFocus) {
+      const buttons = panel.querySelectorAll<HTMLButtonElement>('button');
+      buttons[Math.max(0, Math.min(focusIndex, buttons.length - 1))]?.focus();
+    }
   };
 
   const onOutside = (e: Event) => {
@@ -123,7 +133,8 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
       host.close();
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       const step = e.key === 'ArrowDown' ? 1 : -1;
-      buttons[(index + step + buttons.length) % buttons.length]?.focus();
+      const next = index < 0 ? (step > 0 ? 0 : buttons.length - 1) : (index + step + buttons.length) % buttons.length;
+      buttons[next]?.focus();
     } else if (e.key === 'ArrowLeft') {
       panel.querySelector<HTMLButtonElement>('.vp-menu-back')?.click();
     } else if (e.key !== 'ArrowRight') {
@@ -150,6 +161,7 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
       opts = o;
       if (!visibleDefs(d.store.get()).length) return;
       view = null;
+      previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       panel = h('div', { class: `vp-menu vp-menu-${o.align ?? 'right'}`, role: 'menu' });
       d.layer.append(panel);
       render();
@@ -163,6 +175,7 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
 
     close() {
       if (!panel) return;
+      const hadFocus = panel.contains(document.activeElement);
       panel.removeEventListener('keydown', onKey);
       panel.remove();
       panel = null;
@@ -170,6 +183,8 @@ export function createMenuHost(d: MenuHostDeps): MenuHost {
       unsubscribe = null;
       document.removeEventListener('pointerdown', onOutside, true);
       d.events.emit('ui:menu', { open: false });
+      if (hadFocus && previousFocus?.isConnected) previousFocus.focus();
+      previousFocus = null;
     },
 
     toggle() {

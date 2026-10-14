@@ -83,4 +83,16 @@ describe('createUserActivity', () => {
     fire('pointermove');
     expect(store.get().userActive).toBe(false);
   });
+
+  it('does not schedule a deactivation for a non-finite or oversized timeout', () => {
+    activity.dispose();
+    for (const timeout of [Infinity, NaN, 2_147_483_648]) {
+      store.set({ userActive: false });
+      activity = createUserActivity({ root, store, events, timeout });
+      fire('pointermove');
+      vi.advanceTimersByTime(60_000);
+      expect(store.get().userActive).toBe(true);
+      activity.dispose();
+    }
+  });
 });

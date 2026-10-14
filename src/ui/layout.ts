@@ -73,38 +73,50 @@ export function createLayoutEngine(d: LayoutEngineDeps): LayoutEngine {
       return null;
     }
 
-    applyBaseProps(instance.el, node, d.playerId, d.base.t);
+    try {
+      applyBaseProps(instance.el, node, d.playerId, d.base.t);
 
-    if (node.hide?.length) {
-      const hidden = compileHide(node.hide, d.hideRules, ctx, d.log);
-      ctx.select((s) => hidden(s), (isHidden) => instance.el.classList.toggle('vp-hidden', isHidden), { immediate: true });
+      if (node.hide?.length) {
+        const hidden = compileHide(node.hide, d.hideRules, ctx, d.log);
+        ctx.select((s) => hidden(s), (isHidden) => instance.el.classList.toggle('vp-hidden', isHidden), { immediate: true });
+      }
+
+      if (node.action) {
+        // Capture on the root ancestor: fires before any listener on the element itself,
+        // and stopPropagation keeps the click from reaching the component's own handler.
+        const action = node.action;
+        instance.el.dataset.vpAction = '';
+        ctx.listen(
+          d.base.root,
+          'click',
+          (e) => {
+            // Only the innermost element with an action handles the click (nested actions).
+            if ((e.target as Element | null)?.closest?.('[data-vp-action]') !== instance.el) return;
+            e.stopPropagation();
+            e.preventDefault();
+            d.base.run(action);
+          },
+          { capture: true },
+        );
+      }
+
+      for (const child of node.children ?? []) {
+        const built = ctx.build(child);
+        if (built) (instance.slot ?? instance.el).append(built.el);
+      }
+
+      if (parent) parent.append(instance.el);
+    } catch (e) {
+      d.log.error(`component "${node.type}" failed to set up`, e);
+      try {
+        instance.dispose?.();
+      } catch (err) {
+        d.log.error(`component "${node.type}" failed to dispose`, err);
+      }
+      cleanup();
+      instance.el.remove();
+      return null;
     }
-
-    if (node.action) {
-      // Capture on the root ancestor: fires before any listener on the element itself,
-      // and stopPropagation keeps the click from reaching the component's own handler.
-      const action = node.action;
-      instance.el.dataset.vpAction = '';
-      ctx.listen(
-        d.base.root,
-        'click',
-        (e) => {
-          // Only the innermost element with an action handles the click (nested actions).
-          if ((e.target as Element | null)?.closest?.('[data-vp-action]') !== instance.el) return;
-          e.stopPropagation();
-          e.preventDefault();
-          d.base.run(action);
-        },
-        { capture: true },
-      );
-    }
-
-    for (const child of node.children ?? []) {
-      const built = ctx.build(child);
-      if (built) (instance.slot ?? instance.el).append(built.el);
-    }
-
-    if (parent) parent.append(instance.el);
 
     let disposed = false;
     return {
@@ -113,13 +125,14 @@ export function createLayoutEngine(d: LayoutEngineDeps): LayoutEngine {
       dispose() {
         if (disposed) return;
         disposed = true;
+        instance.el.remove();
+        // Children (registered as disposers via ctx.build) go before the component's own dispose.
+        cleanup();
         try {
           instance.dispose?.();
         } catch (e) {
           d.log.error(`component "${node.type}" failed to dispose`, e);
         }
-        cleanup();
-        instance.el.remove();
       },
     };
   };
