@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PlayerJS compat — demo</title>
+    <link rel="icon" href="data:," />
+    <style>
+      body { margin: 0; padding: 24px; font-family: system-ui, sans-serif; background: #f4f4f5; }
+      main { max-width: 860px; margin: 0 auto; display: grid; gap: 12px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; }
+      button { padding: 6px 10px; border-radius: 6px; border: 1px solid #d4d4d8; background: #fff; cursor: pointer; }
+      #events { font: 12px/1.4 ui-monospace, monospace; background: #18181b; color: #a1a1aa; padding: 8px; height: 140px; overflow: auto; border-radius: 6px; }
+    </style>
+    <script>
+      // PlayerJS-style global callbacks, defined before the bundle loads.
+      function PlayerjsEvents(event, id, data) {
+        if (event === 'time') return;
+        var line = document.createElement('div');
+        line.textContent = id + ' ' + event + (data === undefined ? '' : ' ' + JSON.stringify(data));
+        var box = document.getElementById('events');
+        if (box) box.prepend(line);
+      }
+      function PlayerjsAsync() {
+        window.player = new Playerjs({
+          id: 'player',
+          file: '[360p]assets/video-360.webm or assets/video-360.mp4,[720p]assets/video-720.webm or assets/video-720.mp4',
+          title: 'PlayerJS compat (UMD)',
+          subtitle: '[English]assets/en.vtt',
+          thumbnails: 'assets/thumbs.vtt',
+          default_quality: '360p',
+          color1: '#22c55e',
+          ready: 'onPlayerReady',
+        });
+      }
+      function onPlayerReady(id) {
+        console.log('ready', id);
+      }
+    </script>
+    <script src="assets/player.umd.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>PlayerJS compat</h1>
+      <div id="player"></div>
+      <div class="row">
+        <button onclick="player.api('play')">api('play')</button>
+        <button onclick="player.api('pause')">api('pause')</button>
+        <button onclick="player.api('seek', '+10')">api('seek','+10')</button>
+        <button onclick="player.api('volume', '-0.1')">api('volume','-0.1')</button>
+        <button onclick="player.api('quality', 1)">api('quality',1)</button>
+        <button onclick="alert(player.api('time'))">api('time')</button>
+        <button onclick="player.api('play', 'assets/hls/master.m3u8')">api('play', hls)</button>
+      </div>
+      <div id="events"></div>
+    </main>
+  </body>
+</html>
