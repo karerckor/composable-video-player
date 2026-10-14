@@ -66,5 +66,5 @@ export const dictionaries: Record<'ru' | 'en', Dictionary> = {
 export function createTranslator(lang: 'ru' | 'en' = 'ru', overrides: Partial<Dictionary> = {}): (key: string) => string {
   const dict: Dictionary = { ...(dictionaries[lang] ?? dictionaries.ru) };
   for (const [k, v] of Object.entries(overrides)) if (v !== undefined) dict[k] = v;
-  return (key) => dict[key] ?? key;
+  return (key) => (Object.prototype.hasOwnProperty.call(dict, key) ? (dict[key] as string) : key);
 }

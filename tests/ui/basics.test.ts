@@ -32,7 +32,49 @@ describe('iconEl', () => {
     expect(svg.hasAttribute('onload')).toBe(false);
     expect(el.querySelector('script')).toBeNull();
     expect(el.querySelector('foreignObject')).toBeNull();
-    expect(el.querySelector('a')!.hasAttribute('href')).toBe(false);
+    expect(el.querySelector('a')).toBeNull();
+    expect(el.querySelector('[href]')).toBeNull();
+  });
+
+  it('removes elements outside the allowlist, including foreign namespaces', () => {
+    const el = iconEl('<svg><h:iframe xmlns:h="http://www.w3.org/1999/xhtml" srcdoc="&lt;script&gt;1&lt;/script&gt;"/></svg>');
+    expect(el.querySelector('iframe')).toBeNull();
+    expect(el.querySelector('svg')).not.toBeNull();
+    expect(el.getElementsByTagNameNS('*', 'iframe').length).toBe(0);
+  });
+
+  it('drops obfuscated javascript urls and any href', () => {
+    const el = iconEl('<svg><a href="java&#9;script:alert(1)"><path d="M0 0"/></a></svg>');
+    expect(el.querySelector('a')).toBeNull();
+    expect(el.querySelector('[href]')).toBeNull();
+  });
+
+  it('removes style elements but keeps shapes', () => {
+    const el = iconEl('<svg><style>body{background:red}</style><path d="M0 0"/></svg>');
+    expect(el.querySelector('style')).toBeNull();
+    expect(el.querySelector('path')).not.toBeNull();
+  });
+
+  it('removes use and animation elements', () => {
+    const el = iconEl('<svg><use href="#x"/><animate attributeName="href" to="javascript:alert(1)"/></svg>');
+    expect(el.querySelector('use')).toBeNull();
+    expect(el.querySelector('animate')).toBeNull();
+  });
+
+  it('removes style attributes with url() and unsafe attribute values', () => {
+    const el = iconEl('<svg><path style="fill:URL(http://evil)" d="M0 0"/><path d="M1 1" fill=" JaVa&#10;script:x"/></svg>');
+    const paths = el.querySelectorAll('path');
+    expect(paths[0]!.hasAttribute('style')).toBe(false);
+    expect(paths[1]!.hasAttribute('fill')).toBe(false);
+    expect(paths[1]!.getAttribute('d')).toBe('M1 1');
+  });
+
+  it('keeps every default icon intact', () => {
+    for (const markup of Object.values(defaultIcons)) {
+      const svg = iconEl(markup).querySelector('svg');
+      expect(svg).not.toBeNull();
+      expect(svg!.querySelector('path')).not.toBeNull();
+    }
   });
 
   it('ignores invalid markup', () => {
@@ -49,6 +91,12 @@ describe('createTranslator', () => {
     const en = createTranslator('en', { quality: 'Resolution' });
     expect(en('quality')).toBe('Resolution');
     expect(en('speed')).toBe('Speed');
+  });
+
+  it('does not return Object.prototype members', () => {
+    const t = createTranslator('en');
+    expect(t('constructor')).toBe('constructor');
+    expect(t('toString')).toBe('toString');
   });
 });
 

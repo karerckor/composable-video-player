@@ -10,6 +10,7 @@ export type Action =
 
 const ALIGNS: readonly string[] = ['left', 'center', 'right'];
 const PATH_RE = /^[A-Za-z_$][\w$]*(\.[A-Za-z_$][\w$]*)*$/;
+const BLOCKED_SEGMENTS = new Set(['eval', 'Function', 'setTimeout', 'setInterval', 'execScript', 'constructor', '__proto__', 'prototype']);
 const trimAll = (parts: string[]) => parts.map((p) => p.trim());
 
 export function parseAction(input: string): Action[] {
@@ -57,13 +58,12 @@ function resolveGlobal(path: string): { fn: unknown; self: unknown } {
 }
 
 export function createActionRunner(d: ActionRunnerDeps): (action: string) => void {
-  const fill = (value: string) => {
+  const whole = (n: number) => String(Number.isFinite(n) ? Math.floor(n) : 0);
+  const fill = (value: string, encode = false) => {
     const s = d.store.get();
     return value.replace(/\{(time|duration|title|file)\}/g, (_m, key: string) => {
-      if (key === 'time') return String(Math.floor(s.currentTime));
-      if (key === 'duration') return String(Math.floor(s.duration));
-      if (key === 'title') return s.title;
-      return s.url;
+      const raw = key === 'time' ? whole(s.currentTime) : key === 'duration' ? whole(s.duration) : key === 'title' ? s.title : s.url;
+      return encode ? encodeURIComponent(raw) : raw;
     });
   };
 
@@ -75,7 +75,8 @@ export function createActionRunner(d: ActionRunnerDeps): (action: string) => voi
         break;
       }
       case 'js': {
-        if (!PATH_RE.test(action.fn)) {
+        // `js:` actions are author-controlled code, equivalent to the page calling the function itself.
+        if (!PATH_RE.test(action.fn) || action.fn.split('.').some((segment) => BLOCKED_SEGMENTS.has(segment))) {
           d.log.warn(`invalid js action "${action.fn}"`);
           break;
         }
@@ -84,7 +85,7 @@ export function createActionRunner(d: ActionRunnerDeps): (action: string) => voi
           d.log.warn(`js action "${action.fn}" is not a function`);
           break;
         }
-        fn.apply(self, action.args.map(fill));
+        fn.apply(self, action.args.map((arg) => fill(arg)));
         break;
       }
       case 'event':
@@ -94,7 +95,7 @@ export function createActionRunner(d: ActionRunnerDeps): (action: string) => voi
         d.menus.open({ only: action.only.length ? action.only : undefined, align: action.align });
         break;
       case 'url':
-        window.open(fill(action.url), '_blank', 'noopener');
+        window.open(fill(action.url, true), '_blank', 'noopener');
         break;
     }
   };

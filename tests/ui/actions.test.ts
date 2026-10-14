@@ -3,7 +3,7 @@ import { createActionRunner, parseAction } from '../../src/ui/actions';
 import { createStore } from '../../src/core/store';
 import { createLogger } from '../../src/core/logger';
 import { createInitialState } from '../../src/core/initial-state';
-import type { MenuHost, Player } from '../../src/types';
+import type { MenuHost, Player, PlayerState } from '../../src/types';
 
 describe('parseAction', () => {
   it('parses api chains', () => {
@@ -29,8 +29,8 @@ describe('createActionRunner', () => {
     delete (window as any).ns;
   });
 
-  function setup() {
-    const store = createStore({ ...createInitialState({ container: 'x' }), currentTime: 12.7, duration: 60, title: 'T', url: 'v.mp4' });
+  function setup(patch: Partial<PlayerState> = {}) {
+    const store = createStore({ ...createInitialState({ container: 'x' }), currentTime: 12.7, duration: 60, title: 'T', url: 'v.mp4', ...patch });
     const container = document.createElement('div');
     const api = vi.fn();
     const player = { api, container } as unknown as Player;
@@ -61,6 +61,39 @@ describe('createActionRunner', () => {
     const { run } = setup();
     run('js:alert(1)');
     expect(console.warn).toHaveBeenCalled();
+  });
+
+  it('refuses dangerous js paths', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const w = window as any;
+    const evalSpy = vi.spyOn(w, 'eval');
+    const timeout = vi.spyOn(w, 'setTimeout');
+    w.ns = { x: 1 };
+    const { run } = setup();
+    run('js:eval,1+1');
+    run('js:setTimeout,x');
+    run('js:ns.constructor');
+    run('js:ns.__proto__.x');
+    expect(evalSpy).not.toHaveBeenCalled();
+    expect(timeout).not.toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledTimes(4);
+  });
+
+  it('url-encodes placeholders in urls only', () => {
+    const { run, api } = setup({ title: 'a&b#c' });
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    run('https://x/?t={title}');
+    expect(open).toHaveBeenCalledWith('https://x/?t=a%26b%23c', '_blank', 'noopener');
+    run('api:title,{title}');
+    expect(api).toHaveBeenCalledWith('title', 'a&b#c');
+  });
+
+  it('uses 0 for non-finite time and duration', () => {
+    const { run, api } = setup({ duration: Infinity, currentTime: NaN });
+    run('api:seek,{duration}');
+    run('api:seek,{time}');
+    expect(api).toHaveBeenNthCalledWith(1, 'seek', '0');
+    expect(api).toHaveBeenNthCalledWith(2, 'seek', '0');
   });
 
   it('dispatches events, opens menus and urls', () => {
