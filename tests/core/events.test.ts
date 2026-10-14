@@ -44,6 +44,17 @@ describe('createEventBus', () => {
     expect(cb).not.toHaveBeenCalled();
   });
 
+  it('keys once listeners by event name as well as callback', () => {
+    const bus = createEventBus();
+    const cb = vi.fn();
+    bus.once('play', cb);
+    bus.once('pause', cb);
+    bus.off('play', cb);
+    bus.emit('play');
+    bus.emit('pause');
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
   it('off removes a handler', () => {
     const bus = createEventBus();
     const cb = vi.fn();
