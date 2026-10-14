@@ -11,11 +11,16 @@ export function playlistPanelComponent(onSelect: (index: number) => void, onClos
     close.setLabel('close');
     const el = h(
       'div',
-      { class: 'vp-playlist', role: 'dialog', 'aria-label': ctx.t('playlist') },
+      { class: 'vp-playlist', id: `${ctx.player.id}_playlist`, role: 'dialog', 'aria-label': ctx.t('playlist') },
       h('div', { class: 'vp-playlist-header' }, close.el, h('span', { class: 'vp-playlist-heading' }, ctx.t('playlist'))),
       list,
     );
     ctx.listen(el, 'click', (e) => e.stopPropagation());
+    ctx.listen(el, 'keydown', (e) => {
+      if ((e as KeyboardEvent).key !== 'Escape') return;
+      e.stopPropagation();
+      onClose();
+    });
 
     const render = (pl: PlaylistState | undefined) => {
       list.replaceChildren();
@@ -50,6 +55,20 @@ export function playlistPanelComponent(onSelect: (index: number) => void, onClos
       immediate: true,
       equals: (a, b) => a?.items === b?.items && a?.index === b?.index,
     });
+    // Keyboard focus follows the panel: into it on open (only if focus was in the player), back to the button on close.
+    ctx.select(
+      (s) => !!s.playlist?.open,
+      (open) => {
+        const active = el.ownerDocument.activeElement;
+        if (open) {
+          if (!active || !ctx.root.contains(active)) return;
+          // Deferred: the layout un-hides the panel in a later subscriber, and hidden elements can't take focus.
+          queueMicrotask(() => (list.querySelector<HTMLElement>('.vp-playlist-item.vp-active') ?? list.querySelector<HTMLElement>('.vp-playlist-item'))?.focus());
+        } else if (active && el.contains(active)) {
+          ctx.root.querySelector<HTMLElement>('.vp-playlist-button')?.focus();
+        }
+      },
+    );
     return { el };
   };
 }

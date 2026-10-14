@@ -50,6 +50,11 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
       const startOpen = (o.hidePlaylist ?? ctx.options.hidePlaylist ?? true) === false;
       let plstart = o.plstart ?? ctx.options.plstart;
       let itemThumbs = false;
+      /** True while the plugin itself issues `load`, so the before-hook can tell it from a direct load. */
+      let internal = false;
+      /** Bumped by every navigation or direct load; deferred steps (autonext) check it before running. */
+      let epoch = 0;
+      let cancelPlay: (() => void) | null = null;
       ctx.store.set({ autonext: o.autonext ?? ctx.options.autonext ?? true, playlistLoop: o.playlistLoop ?? ctx.options.playlistLoop ?? false });
 
       const current = () => ctx.store.get().playlist;
@@ -60,8 +65,13 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
 
       /** Spec §3.4: play after the provider loaded the item; cancelled by the next load or an error. */
       const playAfterLoad = () => {
+        cancelPlay?.();
         const offs: Array<() => void> = [];
-        const cleanup = () => offs.forEach((off) => off());
+        const cleanup = () => {
+          offs.forEach((off) => off());
+          if (cancelPlay === cleanup) cancelPlay = null;
+        };
+        cancelPlay = cleanup;
         offs.push(
           ctx.events.once('metadata', () => {
             cleanup();
@@ -76,6 +86,7 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
         const pl = current();
         const entry = pl?.flat[index];
         if (!pl || !entry) return;
+        epoch++;
         const item = entry.item;
         const startTime = item.start === 'continue' ? ctx.store.get().currentTime : typeof item.start === 'number' ? item.start : undefined;
         ctx.store.set({ playlist: { ...pl, index } });
@@ -93,17 +104,23 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
         const start = startTime ?? spec.start;
         if (start !== undefined) input.start = start;
         else delete input.start;
-        ctx.commands.run('load', [input]);
+        internal = true;
+        try {
+          ctx.commands.run('load', [input]);
+        } finally {
+          internal = false;
+        }
         if (autoplay) playAfterLoad();
       };
 
-      const setItems = (items: PlaylistItem[]) => {
+      const setItems = (items: PlaylistItem[], load = true) => {
         const flat = flattenPlaylist(items);
-        const startIndex = plstart !== undefined ? Math.max(0, findIndex(flat, plstart)) : 0;
-        plstart = undefined;
         ctx.store.set({ playlist: { items, flat, index: -1, open: current()?.open ?? startOpen } });
         ctx.events.emit('playlist', items);
-        if (flat.length) playIndex(startIndex, false);
+        if (!load || !flat.length) return;
+        const startIndex = plstart !== undefined ? Math.max(0, findIndex(flat, plstart)) : 0;
+        plstart = undefined;
+        playIndex(startIndex, false);
       };
 
       let request = 0;
@@ -143,6 +160,7 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
         const b = createIconButton(ui, 'vp-playlist-button', () => ui.user('togglePlaylist'));
         b.setIcon('playlist');
         b.setLabel('playlist');
+        b.el.setAttribute('aria-controls', `${ui.player.id}_playlist`);
         ui.select((s) => !!s.playlist?.open, (isOpen) => b.el.setAttribute('aria-expanded', String(isOpen)), { immediate: true });
         return { el: b.el };
       });
@@ -158,8 +176,12 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
       );
 
       // Hide rules
-      ctx.registerHideRule('first-item', () => ({ test: (s) => !s.playlist || (s.playlist.index <= 0 && !s.playlistLoop) }));
-      ctx.registerHideRule('last-item', () => ({ test: (s) => !s.playlist || (s.playlist.index >= s.playlist.flat.length - 1 && !s.playlistLoop) }));
+      ctx.registerHideRule('first-item', () => ({
+        test: (s) => !s.playlist || s.playlist.flat.length < 2 || (s.playlist.index <= 0 && !s.playlistLoop),
+      }));
+      ctx.registerHideRule('last-item', () => ({
+        test: (s) => !s.playlist || s.playlist.flat.length < 2 || (s.playlist.index >= s.playlist.flat.length - 1 && !s.playlistLoop),
+      }));
       ctx.registerHideRule('no-playlist', () => ({ test: (s) => !s.playlist || s.playlist.flat.length < 2 }));
       ctx.registerHideRule('playlist-closed', () => ({ test: (s) => !s.playlist?.open }));
 
@@ -168,7 +190,11 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
 
         ctx.commands.before('load', ([input]) => {
           if (!isPlaylistInput(input)) {
-            request++; // a direct load supersedes a playlist that is still loading
+            if (internal) return;
+            // A direct load supersedes a playlist that is still loading, and makes the current one stale.
+            request++;
+            epoch++;
+            if (current()) ctx.store.set({ playlist: undefined });
             return;
           }
           open(input as string);
@@ -195,10 +221,12 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
           ctx.events.emit('previous');
         }),
         ctx.commands.register('push', ([items]) => {
+          request++; // supersedes an in-flight setPlaylist
           const pl = current();
           const added = normalizePlaylist(items);
           if (!pl) {
-            setItems(added);
+            // Don't hijack a player that already has a source.
+            setItems(added, ctx.store.get().status === 'idle');
             return;
           }
           const merged = [...pl.items, ...added];
@@ -211,12 +239,22 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
 
         ctx.events.on('end', () => {
           if (!ctx.store.get().autonext) return;
-          const index = neighbour(1);
-          if (index !== null) playIndex(index, true);
+          // Defer so every other `end` handler (e.g. memory forgetting the finished item) runs first.
+          const mark = epoch;
+          queueMicrotask(() => {
+            if (mark !== epoch || !ctx.store.get().autonext) return;
+            const index = neighbour(1);
+            if (index !== null) playIndex(index, true);
+          });
         }),
       ];
 
-      return () => offs.forEach((off) => off());
+      return () => {
+        request++;
+        epoch++;
+        cancelPlay?.();
+        offs.forEach((off) => off());
+      };
     },
   };
 }
