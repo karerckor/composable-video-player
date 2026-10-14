@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createUIHarness } from '../helpers/ui-harness';
 import { registerBuiltinComponents, BUILTIN_COMPONENTS } from '../../src/components';
 import { defaultLayout } from '../../src/ui/default-layout';
+import css from '../../src/theme/player.css?inline';
 
 describe('default layout', () => {
   it('builds with built-in components only, without warnings', () => {
@@ -41,5 +42,9 @@ describe('default layout', () => {
     expect(Object.keys(BUILTIN_COMPONENTS).sort()).toEqual(
       ['big-play', 'buffering', 'duration', 'error-overlay', 'fullscreen', 'group', 'live', 'media-click-layer', 'mute', 'overlay', 'play', 'root', 'settings', 'spacer', 'text', 'time', 'timeline', 'title', 'toolbar', 'volume'].sort(),
     );
+  });
+
+  it('collapses hidden controls inside toolbar rows instead of keeping their space', () => {
+    expect(css).toMatch(/\.vp-group\s*>\s*\.vp-hidden\s*\{[^}]*display:\s*none/);
   });
 });

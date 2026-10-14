@@ -101,6 +101,10 @@
   visibility: hidden !important;
   pointer-events: none !important;
 }
+/* Hidden items inside a row/column collapse instead of keeping their space. */
+.vp-group > .vp-hidden {
+  display: none !important;
+}
 
 /* ===== Anchors ===== */
 .vp-anchor {
