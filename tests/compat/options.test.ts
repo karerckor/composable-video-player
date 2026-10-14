@@ -1,0 +1,93 @@
+import { describe, expect, it, vi } from 'vitest';
+import { mapPlayerjsOptions } from '../../src/compat/options';
+import { createLogger } from '../../src/core/logger';
+
+const log = createLogger(false);
+
+describe('mapPlayerjsOptions', () => {
+  it('maps PlayerJS names, 0/1 flags and numbers', () => {
+    const out = mapPlayerjsOptions(
+      {
+        id: 'player',
+        file: '[720p]a.mp4',
+        poster: 'p.jpg',
+        title: 'T',
+        autoplay: 1,
+        loop: '0',
+        volume: '0.5',
+        start: 10,
+        end: -5,
+        ratio: '4:3',
+        default_quality: 'max',
+        forbidden_quality: '1080p',
+        qualities: '480p,720p',
+        default_audio: 'Ru',
+        rename_audio: { 0: 'Русский' },
+        default_speed: '1.25',
+        default_subtitle: 'En',
+        subtitle: '[En]en.vtt',
+        subtitle_start: 0,
+        subshift: '-5',
+        thumbnails: 't.vtt',
+        autonext: 0,
+        playlistloop: 1,
+        plstart: 's2',
+        hideplaylist: 0,
+        cuid: 'c1',
+        hls: 1,
+        hlsconfig: { maxBufferLength: 5 },
+        log: 1,
+        color1: '#f00',
+        color3: '#00f',
+      },
+      log,
+    );
+    expect(out).toEqual({
+      container: 'player',
+      source: '[720p]a.mp4',
+      poster: 'p.jpg',
+      title: 'T',
+      autoplay: true,
+      loop: false,
+      volume: 0.5,
+      start: 10,
+      end: -5,
+      ratio: '4:3',
+      defaultQuality: 'max',
+      forbiddenQuality: '1080p',
+      qualities: '480p,720p',
+      defaultAudio: 'Ru',
+      renameAudio: { 0: 'Русский' },
+      defaultSpeed: 1.25,
+      defaultSubtitle: 'En',
+      subtitle: '[En]en.vtt',
+      subtitleStart: false,
+      subshift: -5,
+      thumbnails: 't.vtt',
+      autonext: false,
+      playlistLoop: true,
+      plstart: 's2',
+      hidePlaylist: false,
+      cuid: 'c1',
+      forceType: 'hls',
+      hlsConfig: { maxBufferLength: 5 },
+      log: true,
+      theme: { color1: '#f00', color3: '#00f' },
+    });
+  });
+
+  it('parses hlsconfig given as a JSON string', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect(mapPlayerjsOptions({ id: 'p', hlsconfig: '{"maxBufferLength":3}' }, log).hlsConfig).toEqual({ maxBufferLength: 3 });
+    expect(mapPlayerjsOptions({ id: 'p', hlsconfig: '{bad' }, log).hlsConfig).toBeUndefined();
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores compat-only keys, warns on unknown keys and requires id', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const out = mapPlayerjsOptions({ id: 'p', nocontrols: 1, ready: 'fn', postmessage: 1, postmessageOrigin: 'https://a', mystery: 1 }, log);
+    expect(out).toEqual({ container: 'p' });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(() => mapPlayerjsOptions({} as never, log)).toThrow(/id/);
+  });
+});
