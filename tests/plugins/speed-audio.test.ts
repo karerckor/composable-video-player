@@ -12,7 +12,7 @@ describe('speedPlugin', () => {
     const { player, host } = createTestPlayer({ plugins: [speedPlugin({ speeds: [0.5, 1, 2] })] });
     expect(player.state.speeds).toEqual([0.5, 1, 2]);
     host.querySelector<HTMLButtonElement>('.vp-settings')!.click();
-    expect(menuLabels(host)).toEqual(['0.5x', 'Обычная', '2x']);
+    expect(menuLabels(host)).toEqual(['0.5x', 'Normal', '2x']);
     host.querySelectorAll<HTMLButtonElement>('.vp-menu-item')[2]!.click();
     expect(player.state.rate).toBe(2);
     player.api('speed', 0);

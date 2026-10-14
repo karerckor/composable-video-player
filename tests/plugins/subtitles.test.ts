@@ -66,7 +66,7 @@ describe('subtitlesPlugin', () => {
     await flush();
     host.querySelector<HTMLButtonElement>('.vp-settings')!.click();
     const items = [...host.querySelectorAll<HTMLButtonElement>('.vp-menu-item')];
-    expect(items.map((b) => b.querySelector('.vp-menu-label')!.textContent)).toEqual(['Выкл', 'En', 'Ru']);
+    expect(items.map((b) => b.querySelector('.vp-menu-label')!.textContent)).toEqual(['Off', 'En', 'Ru']);
     items[0]!.click();
     expect(player.state.textTrack).toBe(-1);
     expect(events).toEqual(['off']);

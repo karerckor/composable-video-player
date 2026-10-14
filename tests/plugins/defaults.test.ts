@@ -44,7 +44,7 @@ describe('defaultPlugins', () => {
     expect(fp.loads[0]!.url).toBe('b.mp4');
     host.querySelector<HTMLButtonElement>('.vp-settings')!.click();
     const labels = [...host.querySelectorAll('.vp-menu-item .vp-menu-label')].map((e) => e.textContent);
-    expect(labels).toEqual(['Качество', 'Скорость']);
+    expect(labels).toEqual(['Quality', 'Speed']);
     player.root.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyM', bubbles: true, cancelable: true }));
     expect(player.state.muted).toBe(true);
     expect(localStorage.getItem('vp:muted')).toBe('1');

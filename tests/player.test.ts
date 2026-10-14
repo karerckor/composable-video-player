@@ -23,6 +23,14 @@ beforeEach(() => {
 afterEach(() => player?.destroy());
 
 describe('createPlayer', () => {
+  it('speaks English by default and Russian with lang: "ru"', () => {
+    player = createPlayer({ container: 'player' });
+    expect(host.querySelector('.vp-settings')!.getAttribute('aria-label')).toBe('Settings');
+    player.destroy();
+    player = createPlayer({ container: 'player', lang: 'ru' });
+    expect(host.querySelector('.vp-settings')!.getAttribute('aria-label')).toBe('Настройки');
+  });
+
   it('builds the DOM skeleton and injects styles once', () => {
     player = createPlayer({ container: 'player' });
     const second = createPlayer({ container: document.body.appendChild(document.createElement('div')) });

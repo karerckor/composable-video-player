@@ -50,7 +50,7 @@ describe('qualityPlugin', () => {
     await flush();
     fp.ctx.setQualities([{ label: 'auto' }, { label: '360p' }, { label: '720p' }], 0);
     host.querySelector<HTMLButtonElement>('.vp-settings')!.click();
-    expect(host.querySelector('.vp-menu-item .vp-menu-label')!.textContent).toBe('Авто');
+    expect(host.querySelector('.vp-menu-item .vp-menu-label')!.textContent).toBe('Auto');
     expect(player.state.qualities).toHaveLength(3);
   });
 

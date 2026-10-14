@@ -101,7 +101,7 @@ export function createPlayerCore(options: PlayerOptions): Player {
   registerBuiltinComponents(components);
   const hideRules = createRegistry<HideRuleFactory>('hide rule', log);
   registerBuiltinHideRules(hideRules);
-  const t = createTranslator(options.lang ?? 'ru', options.i18n);
+  const t = createTranslator(options.lang ?? 'en', options.i18n);
   const icon = createIconSet(options.icons);
   const menus = createMenuHost({ layer: layerAbove, store, events, t, icon, log });
   const activity = createUserActivity({ root, store, events, timeout: options.idleTimeout ?? 3000 });

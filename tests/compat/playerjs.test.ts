@@ -27,6 +27,11 @@ describe('Playerjs', () => {
     expect(instance.player.id).toBe('player');
   });
 
+  it('keeps PlayerJS’s Russian UI by default', () => {
+    instance = new Playerjs({ id: 'player' });
+    expect(document.querySelector('#player .vp-settings')!.getAttribute('aria-label')).toBe('Настройки');
+  });
+
   it('delivers init and later events to PlayerjsEvents and DOM listeners', async () => {
     const calls: Array<[string, string, unknown]> = [];
     (window as unknown as { PlayerjsEvents: unknown }).PlayerjsEvents = (e: string, id: string, data: unknown) => calls.push([e, id, data]);

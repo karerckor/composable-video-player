@@ -55,7 +55,7 @@ export class Playerjs {
     };
 
     if (flag(opts.nocontrols)) options.layout = { type: 'root', children: [{ type: 'media-click-layer' }] };
-    this.player = createPlayerCore({ ...options, plugins: [compat, ...defaultPlugins()] });
+    this.player = createPlayerCore({ lang: 'ru', ...options, plugins: [compat, ...defaultPlugins()] });
   }
 
   api(cmd: string, arg?: unknown): unknown {
