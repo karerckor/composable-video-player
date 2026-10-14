@@ -104,6 +104,22 @@ describe('media commands', () => {
     expect(d.video.muted).toBe(false);
   });
 
+  it('syncs volume state without waiting for volumechange (a load drops queued media events)', () => {
+    d.video.addEventListener('volumechange', (e) => e.stopImmediatePropagation(), { capture: true });
+    d.commands.run('mute', []);
+    expect(d.store.get().muted).toBe(true);
+    expect(emitted).toContain('mute');
+    d.commands.run('setVolume', [0.4]);
+    expect(d.store.get()).toMatchObject({ volume: 0.4, muted: false });
+    expect(emitted).toEqual(expect.arrayContaining(['volume', 'unmute']));
+  });
+
+  it('emits mute once when volumechange also arrives', () => {
+    d.commands.run('mute', []);
+    d.commands.run('mute', []);
+    expect(emitted.filter((n) => n === 'mute')).toHaveLength(1);
+  });
+
   it('stop pauses, rewinds and emits stop', async () => {
     await d.commands.run('play', []);
     d.video.currentTime = 50;

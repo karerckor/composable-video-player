@@ -17,6 +17,18 @@ function bufferedEnd(video: HTMLVideoElement): number {
   return 0;
 }
 
+/**
+ * Copies volume/muted from the element into the store and emits change events once.
+ * Commands call it directly: a media load drops queued `volumechange` tasks, so the event alone can be lost.
+ */
+export function syncVolume({ video, store, events }: Pick<MediaDeps, 'video' | 'store' | 'events'>): void {
+  const prev = store.get();
+  if (prev.volume === video.volume && prev.muted === video.muted) return;
+  store.set({ volume: video.volume, muted: video.muted });
+  if (prev.volume !== video.volume) events.emit('volume', video.volume);
+  if (prev.muted !== video.muted) events.emit(video.muted ? 'mute' : 'unmute');
+}
+
 export function bindMediaEvents(d: MediaDeps, hooks: MediaEventHooks): () => void {
   const { video, store, events, options } = d;
   const offs: Array<() => void> = [];
@@ -138,12 +150,7 @@ export function bindMediaEvents(d: MediaDeps, hooks: MediaEventHooks): () => voi
 
   on('progress', () => store.set({ buffered: bufferedEnd(video) }));
 
-  on('volumechange', () => {
-    const prev = store.get();
-    store.set({ volume: video.volume, muted: video.muted });
-    if (prev.volume !== video.volume) events.emit('volume', video.volume);
-    if (prev.muted !== video.muted) events.emit(video.muted ? 'mute' : 'unmute');
-  });
+  on('volumechange', () => syncVolume(d));
 
   on('ratechange', () => {
     if (store.get().rate === video.playbackRate) return;

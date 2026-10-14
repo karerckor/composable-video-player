@@ -2,6 +2,7 @@ import type { CommandContext } from '../types.js';
 import type { MediaDeps } from './media-deps.js';
 import { clamp } from '../shared/clamp.js';
 import { enterFullscreen, exitFullscreen, watchFullscreen } from './fullscreen.js';
+import { syncVolume } from './media-events.js';
 
 const isRelative = (v: number | string): v is string => typeof v === 'string' && /^[+-]/.test(v.trim());
 
@@ -59,16 +60,20 @@ export function registerMediaCommands(d: MediaDeps): () => void {
       const volume = clamp(raw, 0, 1);
       video.volume = volume;
       if (volume > 0 && video.muted) video.muted = false;
+      syncVolume(d);
     }),
 
     commands.register('mute', () => {
       video.muted = true;
+      syncVolume(d);
     }),
     commands.register('unmute', () => {
       video.muted = false;
+      syncVolume(d);
     }),
     commands.register('toggleMute', () => {
       video.muted = !video.muted;
+      syncVolume(d);
     }),
 
     commands.register('setRate', ([r]) => {
