@@ -291,6 +291,20 @@
 .vp-timeline-progress {
   background: var(--vp-color-1);
 }
+.vp-timeline-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* A gap in the track, like chapter breaks. */
+.vp-timeline-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  translate: -50% 0;
+  background: var(--vp-color-3);
+}
 .vp-timeline-thumb {
   position: absolute;
   top: 50%;

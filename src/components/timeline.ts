@@ -7,10 +7,11 @@ export const timelineComponent: ComponentFactory = (ctx) => {
   const buffered = h('div', { class: 'vp-timeline-buffered' });
   const progress = h('div', { class: 'vp-timeline-progress' });
   const thumb = h('div', { class: 'vp-timeline-thumb' });
+  const markers = h('div', { class: 'vp-timeline-markers' });
   const el = h(
     'div',
     { class: 'vp-timeline', role: 'slider', tabindex: 0, 'aria-label': ctx.t('timeline'), 'aria-valuemin': 0 },
-    h('div', { class: 'vp-timeline-track' }, buffered, progress, thumb),
+    h('div', { class: 'vp-timeline-track' }, buffered, progress, markers, thumb),
   );
   let dragging = false;
   let activePointerId: number | null = null;
@@ -43,6 +44,21 @@ export const timelineComponent: ComponentFactory = (ctx) => {
       if (!dragging) paint(t, d, b);
     },
     { immediate: true, equals: (a, b) => a[0] === b[0] && a[1] === b[1] && a[2] === b[2] },
+  );
+
+  ctx.select(
+    (s) => [s.markers, s.duration] as const,
+    ([list, duration]) => {
+      const inside = duration > 0 ? list.filter((m) => m.time > 0 && m.time < duration) : [];
+      markers.replaceChildren(
+        ...inside.map((m) => {
+          const tick = h('div', { class: 'vp-timeline-marker' });
+          tick.style.left = `${(m.time / duration) * 100}%`;
+          return tick;
+        }),
+      );
+    },
+    { immediate: true, equals: (a, b) => a[0] === b[0] && a[1] === b[1] },
   );
 
   const pointerOf = (e: Event) => (e as PointerEvent).pointerId ?? 1;

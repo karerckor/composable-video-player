@@ -54,6 +54,14 @@ export interface PlayerState {
   poster: string;
   loop: boolean;
   error: PlayerError | null;
+  /** Ticks drawn on the timeline (chapters, ad breaks, bookmarks). Owned by plugins; not reset on load. */
+  markers: TimelineMarker[];
+}
+
+export interface TimelineMarker {
+  /** Seconds from the start. */
+  time: number;
+  label?: string;
 }
 
 // ---------------------------------------------------------------------------

@@ -172,6 +172,19 @@ describe('timeline', () => {
     expect(el.getAttribute('aria-valuetext')).toBe('0:25 / 1:40');
   });
 
+  it('draws state.markers as ticks and follows changes', () => {
+    const el = build('timeline');
+    const ticks = () => [...el.querySelectorAll<HTMLElement>('.vp-timeline-marker')].map((m) => m.style.left);
+    expect(ticks()).toEqual([]);
+    ui.store.set({ markers: [{ time: 0 }, { time: 25, label: 'Intro' }, { time: 150 }] });
+    // A marker at 0 is the track start and one past the end is off the track: neither is drawn.
+    expect(ticks()).toEqual(['25%']);
+    ui.store.set({ duration: 50 });
+    expect(ticks()).toEqual(['50%']);
+    ui.store.set({ markers: [] });
+    expect(ticks()).toEqual([]);
+  });
+
   it('emits hover/leave events', () => {
     const el = build('timeline');
     rect(el, 0, 200);

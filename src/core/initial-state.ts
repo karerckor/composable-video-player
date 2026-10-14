@@ -30,5 +30,6 @@ export function createInitialState(o: PlayerOptions): PlayerState {
     poster: o.poster ?? '',
     loop: !!o.loop,
     error: null,
+    markers: [],
   };
 }
