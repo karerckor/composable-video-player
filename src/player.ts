@@ -19,6 +19,7 @@ import { createPluginHost } from './core/plugin-host';
 import { createInitialState } from './core/initial-state';
 import { createMediaController } from './core/media-controller';
 import { html5Provider } from './providers/html5';
+import { hlsProvider } from './providers/hls';
 import { createApi } from './api/api-map';
 import { h } from './ui/dom';
 import { createRegistry } from './ui/registry';
@@ -92,7 +93,7 @@ export function createPlayerCore(options: PlayerOptions): Player {
   const store = createStore(createInitialState(options), log);
   const events = createEventBus(log);
   const commands = createCommandRegistry(log);
-  const providers: MediaProvider[] = [html5Provider()];
+  const providers: MediaProvider[] = [html5Provider(), hlsProvider()];
   const transforms: SourceTransform[] = [];
   const controller = createMediaController({ video, root, store, events, commands, log, options, providers, transforms });
 
