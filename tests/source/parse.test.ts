@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isPlaylistInput, normalizeSpec, parseSource, parseSubtitleList, sourceKey } from '../../src/source/parse';
+import { isPlaylistInput, normalizeSpec, parseSource, parseSubtitleList, sourceKey } from '../../src/source/parse.js';
 
 describe('parseSource', () => {
   it('parses a plain url', () => {

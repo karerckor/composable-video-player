@@ -1,4 +1,4 @@
-import type { Logger } from '../types';
+import type { Logger } from '../types.js';
 
 type FsDocument = Document & {
   webkitFullscreenElement?: Element | null;

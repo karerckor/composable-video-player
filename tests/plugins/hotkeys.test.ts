@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { hotkeysPlugin, type HotkeysOptions } from '../../src/plugins/hotkeys';
-import { speedPlugin } from '../../src/plugins/speed';
-import { qualityPlugin } from '../../src/plugins/quality';
-import { createTestPlayer } from '../helpers/player-harness';
-import type { CommandName, Player, Plugin, PlayerState, Store } from '../../src/types';
+import { hotkeysPlugin, type HotkeysOptions } from '../../src/plugins/hotkeys.js';
+import { speedPlugin } from '../../src/plugins/speed.js';
+import { qualityPlugin } from '../../src/plugins/quality.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import type { CommandName, Player, Plugin, PlayerState, Store } from '../../src/types.js';
 
 let player: Player;
 let store: Store<PlayerState>;

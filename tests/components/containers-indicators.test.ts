@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createUIHarness } from '../helpers/ui-harness';
-import * as containers from '../../src/components/containers';
-import * as indicators from '../../src/components/indicators';
+import { createUIHarness } from '../helpers/ui-harness.js';
+import * as containers from '../../src/components/containers.js';
+import * as indicators from '../../src/components/indicators.js';
 
 let ui: ReturnType<typeof createUIHarness>;
 

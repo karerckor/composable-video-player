@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createCommandRegistry } from '../../src/core/commands';
-import { createLogger } from '../../src/core/logger';
+import { createCommandRegistry } from '../../src/core/commands.js';
+import { createLogger } from '../../src/core/logger.js';
 
 describe('createCommandRegistry', () => {
   beforeEach(() => {

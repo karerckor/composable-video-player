@@ -1,4 +1,4 @@
-import type { EventBus, PlayerState, Store } from '../types';
+import type { EventBus, PlayerState, Store } from '../types.js';
 
 export interface UserActivityDeps {
   root: HTMLElement;

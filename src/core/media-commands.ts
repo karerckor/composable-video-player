@@ -1,7 +1,7 @@
-import type { CommandContext } from '../types';
-import type { MediaDeps } from './media-deps';
-import { clamp } from '../shared/clamp';
-import { enterFullscreen, exitFullscreen, watchFullscreen } from './fullscreen';
+import type { CommandContext } from '../types.js';
+import type { MediaDeps } from './media-deps.js';
+import { clamp } from '../shared/clamp.js';
+import { enterFullscreen, exitFullscreen, watchFullscreen } from './fullscreen.js';
 
 const isRelative = (v: number | string): v is string => typeof v === 'string' && /^[+-]/.test(v.trim());
 

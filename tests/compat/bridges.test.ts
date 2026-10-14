@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { bridgeEvents } from '../../src/compat/events';
-import { bridgePostMessage } from '../../src/compat/postmessage';
-import { createEventBus } from '../../src/core/events';
+import { bridgeEvents } from '../../src/compat/events.js';
+import { bridgePostMessage } from '../../src/compat/postmessage.js';
+import { createEventBus } from '../../src/core/events.js';
 
 afterEach(() => {
   delete (window as unknown as { PlayerjsEvents?: unknown }).PlayerjsEvents;

@@ -1,5 +1,5 @@
-import type { EventBus, IconName, Logger, MenuDefinition, MenuHost, PlayerState, Store } from '../types';
-import { h, iconEl } from './dom';
+import type { EventBus, IconName, Logger, MenuDefinition, MenuHost, PlayerState, Store } from '../types.js';
+import { h, iconEl } from './dom.js';
 
 export interface MenuHostDeps {
   layer: HTMLElement;

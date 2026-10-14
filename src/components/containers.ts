@@ -1,6 +1,6 @@
-import type { ComponentFactory, PlayerState } from '../types';
-import { h } from '../ui/dom';
-import { formatTime } from '../shared/time';
+import type { ComponentFactory, PlayerState } from '../types.js';
+import { h } from '../ui/dom.js';
+import { formatTime } from '../shared/time.js';
 
 export const rootComponent: ComponentFactory = () => ({ el: h('div', { class: 'vp-layout-root' }) });
 export const overlayComponent: ComponentFactory = () => ({ el: h('div', { class: 'vp-overlay' }) });

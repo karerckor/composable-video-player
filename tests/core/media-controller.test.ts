@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMediaController } from '../../src/core/media-controller';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createCommandRegistry } from '../../src/core/commands';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import { installFakeMedia, type FakeMedia } from '../helpers/fake-media';
-import { fakeProvider } from '../helpers/fake-provider';
-import { flush } from '../helpers/flush';
-import type { MediaDeps } from '../../src/core/media-deps';
-import type { EventName, PlayerOptions } from '../../src/types';
+import { createMediaController } from '../../src/core/media-controller.js';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createCommandRegistry } from '../../src/core/commands.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import { installFakeMedia, type FakeMedia } from '../helpers/fake-media.js';
+import { fakeProvider } from '../helpers/fake-provider.js';
+import { flush } from '../helpers/flush.js';
+import type { MediaDeps } from '../../src/core/media-deps.js';
+import type { EventName, PlayerOptions } from '../../src/types.js';
 
 let d: MediaDeps;
 let media: FakeMedia;

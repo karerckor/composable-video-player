@@ -1,17 +1,17 @@
 import { vi } from 'vitest';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createCommandRegistry } from '../../src/core/commands';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import { createRegistry } from '../../src/ui/registry';
-import { registerBuiltinHideRules } from '../../src/ui/hide-rules';
-import { createTranslator } from '../../src/ui/i18n';
-import { createIconSet } from '../../src/ui/icons';
-import { createMenuHost } from '../../src/ui/menu-host';
-import { createActionRunner } from '../../src/ui/actions';
-import { createLayoutEngine } from '../../src/ui/layout';
-import type { ComponentFactory, HideRuleFactory, Player, PlayerOptions, PlayerState } from '../../src/types';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createCommandRegistry } from '../../src/core/commands.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import { createRegistry } from '../../src/ui/registry.js';
+import { registerBuiltinHideRules } from '../../src/ui/hide-rules.js';
+import { createTranslator } from '../../src/ui/i18n.js';
+import { createIconSet } from '../../src/ui/icons.js';
+import { createMenuHost } from '../../src/ui/menu-host.js';
+import { createActionRunner } from '../../src/ui/actions.js';
+import { createLayoutEngine } from '../../src/ui/layout.js';
+import type { ComponentFactory, HideRuleFactory, Player, PlayerOptions, PlayerState } from '../../src/types.js';
 
 export function createUIHarness(opts: { state?: Partial<PlayerState>; options?: Partial<PlayerOptions> } = {}) {
   document.body.replaceChildren();

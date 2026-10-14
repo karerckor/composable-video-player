@@ -1,14 +1,14 @@
-import type { Plugin } from '../types';
-import { qualityPlugin } from './quality';
-import { speedPlugin } from './speed';
-import { audioTracksPlugin } from './audiotracks';
-import { subtitlesPlugin } from './subtitles';
-import { thumbnailsPlugin } from './thumbnails';
-import { playlistPlugin } from './playlist';
-import { hotkeysPlugin } from './hotkeys';
-import { autoplayPlugin } from './autoplay';
-import { memoryPlugin } from './memory';
-import { mediaSessionPlugin } from './mediasession';
+import type { Plugin } from '../types.js';
+import { qualityPlugin } from './quality.js';
+import { speedPlugin } from './speed.js';
+import { audioTracksPlugin } from './audiotracks.js';
+import { subtitlesPlugin } from './subtitles/index.js';
+import { thumbnailsPlugin } from './thumbnails/index.js';
+import { playlistPlugin } from './playlist/index.js';
+import { hotkeysPlugin } from './hotkeys.js';
+import { autoplayPlugin } from './autoplay.js';
+import { memoryPlugin } from './memory.js';
+import { mediaSessionPlugin } from './mediasession.js';
 
 /**
  * All v1 plugins. Order matters:
@@ -31,13 +31,13 @@ export function defaultPlugins(): Plugin[] {
   ];
 }
 
-export { qualityPlugin, pickQuality } from './quality';
-export { speedPlugin, DEFAULT_SPEEDS } from './speed';
-export { audioTracksPlugin } from './audiotracks';
-export { subtitlesPlugin } from './subtitles';
-export { thumbnailsPlugin } from './thumbnails';
-export { playlistPlugin, type PlaylistItem, type PlaylistState } from './playlist';
-export { hotkeysPlugin, type HotkeysOptions } from './hotkeys';
-export { autoplayPlugin } from './autoplay';
-export { memoryPlugin, shouldRestorePosition } from './memory';
-export { mediaSessionPlugin } from './mediasession';
+export { qualityPlugin, pickQuality } from './quality.js';
+export { speedPlugin, DEFAULT_SPEEDS } from './speed.js';
+export { audioTracksPlugin } from './audiotracks.js';
+export { subtitlesPlugin } from './subtitles/index.js';
+export { thumbnailsPlugin } from './thumbnails/index.js';
+export { playlistPlugin, type PlaylistItem, type PlaylistState } from './playlist/index.js';
+export { hotkeysPlugin, type HotkeysOptions } from './hotkeys.js';
+export { autoplayPlugin } from './autoplay.js';
+export { memoryPlugin, shouldRestorePosition } from './memory.js';
+export { mediaSessionPlugin } from './mediasession.js';

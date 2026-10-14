@@ -1,4 +1,4 @@
-import type { UIContext } from '../types';
+import type { UIContext } from '../types.js';
 
 const STEP_PX = 50;
 

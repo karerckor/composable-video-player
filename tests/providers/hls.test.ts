@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_HLS_INTEGRITY, DEFAULT_HLS_URL, hlsProvider, loadHlsScript, resetHlsLoader, type HlsConstructor } from '../../src/providers/hls';
-import { createLogger } from '../../src/core/logger';
-import type { PlayerError, ProviderContext, Quality, SourceSpec, TrackInfo } from '../../src/types';
+import { DEFAULT_HLS_INTEGRITY, DEFAULT_HLS_URL, hlsProvider, loadHlsScript, resetHlsLoader, type HlsConstructor } from '../../src/providers/hls.js';
+import { createLogger } from '../../src/core/logger.js';
+import type { PlayerError, ProviderContext, Quality, SourceSpec, TrackInfo } from '../../src/types.js';
 
 const spec: SourceSpec = { qualities: [], subtitles: [] };
 

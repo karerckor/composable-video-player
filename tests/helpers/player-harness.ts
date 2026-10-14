@@ -1,7 +1,7 @@
-import { createPlayerCore as createPlayer } from '../../src/player';
-import { installFakeMedia, type FakeMedia } from './fake-media';
-import { fakeProvider, type FakeProviderOptions } from './fake-provider';
-import type { PlayerOptions, Plugin } from '../../src/types';
+import { createPlayerCore as createPlayer } from '../../src/player.js';
+import { installFakeMedia, type FakeMedia } from './fake-media.js';
+import { fakeProvider, type FakeProviderOptions } from './fake-provider.js';
+import type { PlayerOptions, Plugin } from '../../src/types.js';
 
 /** A real player (composition root) wired to a fake provider and a fake media element. */
 export function createTestPlayer(opts: Partial<PlayerOptions> = {}, providerOptions: FakeProviderOptions = {}) {

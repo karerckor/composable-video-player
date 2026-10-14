@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createApi } from '../../src/api/api-map';
-import { PLAYERJS_EVENTS } from '../../src/api/events-list';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createCommandRegistry } from '../../src/core/commands';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import type { CommandRegistry, EventBus, Player, PlayerState, Store } from '../../src/types';
+import { createApi } from '../../src/api/api-map.js';
+import { PLAYERJS_EVENTS } from '../../src/api/events-list.js';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createCommandRegistry } from '../../src/core/commands.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import type { CommandRegistry, EventBus, Player, PlayerState, Store } from '../../src/types.js';
 
 let store: Store<PlayerState>;
 let commands: CommandRegistry;

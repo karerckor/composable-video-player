@@ -1,4 +1,4 @@
-import type { Logger, Plugin, PluginContext } from '../types';
+import type { Logger, Plugin, PluginContext } from '../types.js';
 
 export interface PluginHost {
   setupAll(plugins: Plugin[], ctx: PluginContext): void;

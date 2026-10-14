@@ -1,6 +1,6 @@
-import type { ComponentFactory } from '../types';
-import { createSlider } from '../ui/slider';
-import { bindWheelVolume } from '../ui/wheel';
+import type { ComponentFactory } from '../types.js';
+import { createSlider } from '../ui/slider.js';
+import { bindWheelVolume } from '../ui/wheel.js';
 
 export const volumeComponent: ComponentFactory = (ctx) => {
   const slider = createSlider(ctx, {

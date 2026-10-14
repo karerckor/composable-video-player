@@ -1,4 +1,4 @@
-import type { BeforeHook, CommandContext, CommandHandler, CommandName, CommandRegistry, Logger } from '../types';
+import type { BeforeHook, CommandContext, CommandHandler, CommandName, CommandRegistry, Logger } from '../types.js';
 
 type AnyHandler = (args: unknown[], ctx: CommandContext) => unknown;
 type AnyHook = (args: unknown[], ctx: CommandContext) => false | void | unknown[];

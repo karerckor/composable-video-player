@@ -1,12 +1,12 @@
-import type { Plugin, SourceSpecInput } from '../../types';
-import { isPlaylistInput, isSourceSpecInput, parseSource, parseSubtitleList } from '../../source/parse';
-import { createIconButton } from '../../ui/button';
-import { findIndex, flattenPlaylist, loadPlaylistInput, normalizePlaylist, type PlaylistItem, type PlaylistState } from './model';
-import { playlistPanelComponent } from './panel';
+import type { Plugin, SourceSpecInput } from '../../types.js';
+import { isPlaylistInput, isSourceSpecInput, parseSource, parseSubtitleList } from '../../source/parse.js';
+import { createIconButton } from '../../ui/button.js';
+import { findIndex, flattenPlaylist, loadPlaylistInput, normalizePlaylist, type PlaylistItem, type PlaylistState } from './model.js';
+import { playlistPanelComponent } from './panel.js';
 
-export type { PlaylistItem, PlaylistState } from './model';
+export type { PlaylistItem, PlaylistState } from './model.js';
 
-declare module '../../types' {
+declare module '../../types.js' {
   interface PlayerState {
     playlist?: PlaylistState;
     autonext?: boolean;

@@ -1,7 +1,7 @@
-import type { ComponentFactory } from '../types';
-import { h } from '../ui/dom';
-import { clamp } from '../shared/clamp';
-import { formatTime } from '../shared/time';
+import type { ComponentFactory } from '../types.js';
+import { h } from '../ui/dom.js';
+import { clamp } from '../shared/clamp.js';
+import { formatTime } from '../shared/time.js';
 
 export const timelineComponent: ComponentFactory = (ctx) => {
   const buffered = h('div', { class: 'vp-timeline-buffered' });

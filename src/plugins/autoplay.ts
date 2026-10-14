@@ -1,6 +1,6 @@
-import type { Plugin } from '../types';
+import type { Plugin } from '../types.js';
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerOptions {
     /** Retry muted when the browser blocks autoplay with sound (default true). */
     autoplayMuteFallback?: boolean;

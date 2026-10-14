@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createStore } from '../../src/core/store';
-import { createLogger } from '../../src/core/logger';
+import { createStore } from '../../src/core/store.js';
+import { createLogger } from '../../src/core/logger.js';
 
 interface S { a: number; b: string; list: number[] }
 const initial = (): S => ({ a: 1, b: 'x', list: [] });

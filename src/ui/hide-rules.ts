@@ -1,5 +1,5 @@
-import type { HideRuleFactory, HideRuleSpec, Logger, PlayerState, UIContext } from '../types';
-import type { Registry } from './registry';
+import type { HideRuleFactory, HideRuleSpec, Logger, PlayerState, UIContext } from '../types.js';
+import type { Registry } from './registry.js';
 
 const simple = (test: (s: PlayerState) => boolean): HideRuleFactory => () => ({ test });
 

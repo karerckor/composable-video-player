@@ -1,6 +1,6 @@
-import type { CommandContext, MenuOption, Plugin, PlayerState } from '../types';
+import type { CommandContext, MenuOption, Plugin, PlayerState } from '../types.js';
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerOptions {
     /** Label, `num:X` (zero-based) or `max`. PlayerJS: default_quality. */
     defaultQuality?: string;

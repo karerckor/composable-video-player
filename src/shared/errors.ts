@@ -1,4 +1,4 @@
-import type { ErrorKind, PlayerError } from '../types';
+import type { ErrorKind, PlayerError } from '../types.js';
 
 const MEDIA_ERROR_KINDS: Record<number, ErrorKind> = { 1: 'unknown', 2: 'network', 3: 'decode', 4: 'unsupported' };
 

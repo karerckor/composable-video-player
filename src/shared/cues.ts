@@ -1,4 +1,4 @@
-import { parseTimestamp } from './time';
+import { parseTimestamp } from './time.js';
 
 export interface Cue {
   start: number;

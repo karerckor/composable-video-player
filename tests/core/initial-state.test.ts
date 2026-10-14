@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createInitialState } from '../../src/core/initial-state';
+import { createInitialState } from '../../src/core/initial-state.js';
 
 describe('createInitialState', () => {
   it('uses defaults', () => {

@@ -1,5 +1,5 @@
-import { createWheelStepper } from '../ui/wheel';
-import type { CommandArgs, CommandContext, CommandName, Plugin } from '../types';
+import { createWheelStepper } from '../ui/wheel.js';
+import type { CommandArgs, CommandContext, CommandName, Plugin } from '../types.js';
 
 export interface HotkeysOptions {
   seekStep?: number;
@@ -11,7 +11,7 @@ export interface HotkeysOptions {
   global?: boolean;
 }
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerOptions {
     hotkeys?: HotkeysOptions | false;
   }

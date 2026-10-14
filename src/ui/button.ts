@@ -1,5 +1,5 @@
-import type { IconName, UIContext } from '../types';
-import { h, iconEl } from './dom';
+import type { IconName, UIContext } from '../types.js';
+import { h, iconEl } from './dom.js';
 
 export interface IconButton {
   el: HTMLButtonElement;

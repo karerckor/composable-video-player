@@ -1,6 +1,6 @@
-import { Playerjs } from './compat/playerjs';
+import { Playerjs } from './compat/playerjs.js';
 
-export * from './index';
+export * from './index.js';
 
 if (typeof window !== 'undefined') {
   const w = window as unknown as { Playerjs?: unknown; PlayerjsAsync?: unknown };

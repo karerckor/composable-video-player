@@ -1,4 +1,4 @@
-import type { Logger, SelectOptions, Store } from '../types';
+import type { Logger, SelectOptions, Store } from '../types.js';
 
 interface Subscription<S, T> {
   selector: (s: S) => T;

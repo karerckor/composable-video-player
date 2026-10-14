@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { playlistPlugin } from '../../src/plugins/playlist';
-import { memoryPlugin } from '../../src/plugins/memory';
-import { fnv1a } from '../../src/shared/hash';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import type { PlayerOptions, Plugin, SourceSpec } from '../../src/types';
+import { playlistPlugin } from '../../src/plugins/playlist/index.js';
+import { memoryPlugin } from '../../src/plugins/memory.js';
+import { fnv1a } from '../../src/shared/hash.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import type { PlayerOptions, Plugin, SourceSpec } from '../../src/types.js';
 
 const ITEMS = [
   { title: 'One', file: 'one.mp4', id: 'a', poster: 'one.jpg', subtitle: '[En]one.vtt', thumbnails: 'one-thumbs.vtt' },

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { pickQuality, qualityPlugin } from '../../src/plugins/quality';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
+import { pickQuality, qualityPlugin } from '../../src/plugins/quality.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
 
 describe('pickQuality', () => {
   const labels = ['360p', '720p', '1080p'];

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mediaSessionPlugin } from '../../src/plugins/mediasession';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import type { Player, PluginContext, Plugin } from '../../src/types';
+import { mediaSessionPlugin } from '../../src/plugins/mediasession.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import type { Player, PluginContext, Plugin } from '../../src/types.js';
 
 const created: Player[] = [];
 function make(opts: Parameters<typeof createTestPlayer>[0]) {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mapPlayerjsOptions } from '../../src/compat/options';
-import { createLogger } from '../../src/core/logger';
+import { mapPlayerjsOptions } from '../../src/compat/options.js';
+import { createLogger } from '../../src/core/logger.js';
 
 const log = createLogger(false);
 

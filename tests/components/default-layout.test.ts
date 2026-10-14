@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createUIHarness } from '../helpers/ui-harness';
-import { registerBuiltinComponents, BUILTIN_COMPONENTS } from '../../src/components';
-import { defaultLayout } from '../../src/ui/default-layout';
+import { createUIHarness } from '../helpers/ui-harness.js';
+import { registerBuiltinComponents, BUILTIN_COMPONENTS } from '../../src/components/index.js';
+import { defaultLayout } from '../../src/ui/default-layout.js';
 import css from '../../src/theme/player.css?inline';
 
 describe('default layout', () => {

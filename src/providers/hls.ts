@@ -1,5 +1,5 @@
-import type { ErrorKind, MediaProvider, PlayerError, ProviderContext, Quality } from '../types';
-import { extOf } from '../shared/url';
+import type { ErrorKind, MediaProvider, PlayerError, ProviderContext, Quality } from '../types.js';
+import { extOf } from '../shared/url.js';
 
 /** The subset of the hls.js API this provider uses. */
 export interface HlsInstance {

@@ -1,4 +1,4 @@
-import type { CommandRegistry, EventBus, Logger, MediaProvider, PlayerOptions, PlayerState, SourceTransform, Store } from '../types';
+import type { CommandRegistry, EventBus, Logger, MediaProvider, PlayerOptions, PlayerState, SourceTransform, Store } from '../types.js';
 
 export interface MediaDeps {
   video: HTMLVideoElement;

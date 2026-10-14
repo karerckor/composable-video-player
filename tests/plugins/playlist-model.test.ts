@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { findIndex, flattenPlaylist, loadPlaylistInput, normalizePlaylist } from '../../src/plugins/playlist/model';
+import { findIndex, flattenPlaylist, loadPlaylistInput, normalizePlaylist } from '../../src/plugins/playlist/model.js';
 
 const items = [
   { title: 'Intro', file: 'intro.mp4', id: 'i' },

@@ -1,6 +1,6 @@
-import type { PlayerError } from '../types';
-import type { MediaDeps } from './media-deps';
-import { mediaErrorToPlayerError } from '../shared/errors';
+import type { PlayerError } from '../types.js';
+import type { MediaDeps } from './media-deps.js';
+import { mediaErrorToPlayerError } from '../shared/errors.js';
 
 export interface MediaEventHooks {
   onMediaError(err: PlayerError): void;

@@ -1,5 +1,5 @@
-import type { PlayerOptions, PlayerState } from '../types';
-import { clamp } from '../shared/clamp';
+import type { PlayerOptions, PlayerState } from '../types.js';
+import { clamp } from '../shared/clamp.js';
 
 export function createInitialState(o: PlayerOptions): PlayerState {
   return {

@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { defaultPlugins } from '../../src/plugins';
-import { createPlayer } from '../../src/create-player';
-import { createPlayerCore } from '../../src/player';
-import { speedPlugin } from '../../src/plugins/speed';
-import * as vp from '../../src/index';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
+import { defaultPlugins } from '../../src/plugins/index.js';
+import { createPlayer } from '../../src/create-player.js';
+import { createPlayerCore } from '../../src/player.js';
+import { speedPlugin } from '../../src/plugins/speed.js';
+import * as vp from '../../src/index.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
 
 beforeEach(() => {
   localStorage.clear();

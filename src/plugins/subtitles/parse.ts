@@ -1,6 +1,6 @@
-import type { Cue } from '../../shared/cues';
+import type { Cue } from '../../shared/cues.js';
 
-export { parseCues as parseSubtitles, type Cue } from '../../shared/cues';
+export { parseCues as parseSubtitles, type Cue } from '../../shared/cues.js';
 
 export function shiftCues(cues: Cue[], seconds: number): Cue[] {
   if (!seconds) return cues;

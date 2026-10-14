@@ -1,6 +1,6 @@
-import type { MediaProvider } from '../types';
-import { extOf } from '../shared/url';
-import { mediaErrorToPlayerError } from '../shared/errors';
+import type { MediaProvider } from '../types.js';
+import { extOf } from '../shared/url.js';
+import { mediaErrorToPlayerError } from '../shared/errors.js';
 
 export function hasNativeHls(): boolean {
   if (typeof document === 'undefined') return false;

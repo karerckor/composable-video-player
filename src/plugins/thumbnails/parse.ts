@@ -1,5 +1,5 @@
-import { parseCues } from '../../shared/cues';
-import { resolveUrl } from '../../shared/url';
+import { parseCues } from '../../shared/cues.js';
+import { resolveUrl } from '../../shared/url.js';
 
 export interface Thumb {
   start: number;

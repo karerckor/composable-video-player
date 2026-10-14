@@ -1,6 +1,6 @@
-import type { UIContext } from '../types';
-import { h } from './dom';
-import { clamp } from '../shared/clamp';
+import type { UIContext } from '../types.js';
+import { h } from './dom.js';
+import { clamp } from '../shared/clamp.js';
 
 export interface SliderOptions {
   className: string;

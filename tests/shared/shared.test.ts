@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { clamp } from '../../src/shared/clamp';
-import { mediaErrorToPlayerError, toPlayerError } from '../../src/shared/errors';
-import { extOf, resolveUrl } from '../../src/shared/url';
-import { formatTime, parseTimestamp } from '../../src/shared/time';
+import { clamp } from '../../src/shared/clamp.js';
+import { mediaErrorToPlayerError, toPlayerError } from '../../src/shared/errors.js';
+import { extOf, resolveUrl } from '../../src/shared/url.js';
+import { formatTime, parseTimestamp } from '../../src/shared/time.js';
 
 describe('clamp', () => {
   it('limits a value to a range', () => {

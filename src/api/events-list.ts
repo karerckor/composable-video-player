@@ -1,4 +1,4 @@
-import type { EventName } from '../types';
+import type { EventName } from '../types.js';
 
 /** Events forwarded to PlayerJS-style listeners (internal `ui:*` events are excluded). */
 export const PLAYERJS_EVENTS: readonly EventName[] = [

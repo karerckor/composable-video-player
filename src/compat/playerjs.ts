@@ -1,12 +1,12 @@
-import type { Player, Plugin } from '../types';
-import { createPlayerCore } from '../player';
-import { createLogger } from '../core/logger';
-import { defaultPlugins } from '../plugins';
-import { bridgeEvents } from './events';
-import { bridgePostMessage } from './postmessage';
-import { flag, mapPlayerjsOptions, type PlayerjsOptions } from './options';
+import type { Player, Plugin } from '../types.js';
+import { createPlayerCore } from '../player.js';
+import { createLogger } from '../core/logger.js';
+import { defaultPlugins } from '../plugins/index.js';
+import { bridgeEvents } from './events.js';
+import { bridgePostMessage } from './postmessage.js';
+import { flag, mapPlayerjsOptions, type PlayerjsOptions } from './options.js';
 
-export type { PlayerjsOptions } from './options';
+export type { PlayerjsOptions } from './options.js';
 
 /** Drop-in style facade: `new Playerjs({ id, file, ... })` + `player.api(cmd, arg)`. */
 export class Playerjs {

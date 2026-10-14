@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createUIHarness } from '../helpers/ui-harness';
-import { bigPlayComponent, fullscreenComponent, muteComponent, playComponent, settingsComponent } from '../../src/components/buttons';
-import { volumeComponent } from '../../src/components/volume';
-import { timelineComponent } from '../../src/components/timeline';
-import type { CommandName } from '../../src/types';
+import { createUIHarness } from '../helpers/ui-harness.js';
+import { bigPlayComponent, fullscreenComponent, muteComponent, playComponent, settingsComponent } from '../../src/components/buttons.js';
+import { volumeComponent } from '../../src/components/volume.js';
+import { timelineComponent } from '../../src/components/timeline.js';
+import type { CommandName } from '../../src/types.js';
 
 let ui: ReturnType<typeof createUIHarness>;
 let calls: Array<[string, unknown[]]>;

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { autoplayPlugin } from '../../src/plugins/autoplay';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import type { Plugin, PlayerState, Store } from '../../src/types';
+import { autoplayPlugin } from '../../src/plugins/autoplay.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import type { Plugin, PlayerState, Store } from '../../src/types.js';
 
 const notAllowed = () => new DOMException('autoplay blocked', 'NotAllowedError');
 

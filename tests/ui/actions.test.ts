@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createActionRunner, parseAction } from '../../src/ui/actions';
-import { createStore } from '../../src/core/store';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import type { MenuHost, Player, PlayerState } from '../../src/types';
+import { createActionRunner, parseAction } from '../../src/ui/actions.js';
+import { createStore } from '../../src/core/store.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import type { MenuHost, Player, PlayerState } from '../../src/types.js';
 
 describe('parseAction', () => {
   it('parses api chains', () => {

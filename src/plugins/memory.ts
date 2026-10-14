@@ -1,6 +1,6 @@
-import type { CommandContext, Plugin } from '../types';
-import { sourceKey } from '../source/parse';
-import { fnv1a } from '../shared/hash';
+import type { CommandContext, Plugin } from '../types.js';
+import { sourceKey } from '../source/parse.js';
+import { fnv1a } from '../shared/hash.js';
 
 export interface MemoryOptions {
   position?: boolean;
@@ -15,7 +15,7 @@ export interface MemoryOptions {
   storage?: Storage | null;
 }
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerOptions {
     memory?: Omit<MemoryOptions, 'storage'> | false;
     /** Stable id for remembering the position. PlayerJS: cuid. */

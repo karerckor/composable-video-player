@@ -1,4 +1,4 @@
-import type { LayoutNode } from '../types';
+import type { LayoutNode } from '../types.js';
 
 /** The default PlayerJS-like layout. Copy and modify it to build your own. */
 export const defaultLayout: LayoutNode = {

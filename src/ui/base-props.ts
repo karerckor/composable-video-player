@@ -1,4 +1,4 @@
-import type { BaseProps } from '../types';
+import type { BaseProps } from '../types.js';
 
 const toCssLength = (v: string) => (/^-?\d+(\.\d+)?$/.test(v) ? `${v}px` : v);
 

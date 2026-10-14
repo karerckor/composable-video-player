@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createMenuHost } from '../../src/ui/menu-host';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import { createTranslator } from '../../src/ui/i18n';
-import { createIconSet } from '../../src/ui/icons';
-import type { MenuDefinition, MenuHost, PlayerState, Store } from '../../src/types';
+import { createMenuHost } from '../../src/ui/menu-host.js';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import { createTranslator } from '../../src/ui/i18n.js';
+import { createIconSet } from '../../src/ui/icons.js';
+import type { MenuDefinition, MenuHost, PlayerState, Store } from '../../src/types.js';
 
 let store: Store<PlayerState>;
 let layer: HTMLElement;

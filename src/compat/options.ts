@@ -1,5 +1,5 @@
-import type { Logger, PlayerOptions, SourceInput, ThemeVars } from '../types';
-import type { PlaylistItem } from '../plugins/playlist';
+import type { Logger, PlayerOptions, SourceInput, ThemeVars } from '../types.js';
+import type { PlaylistItem } from '../plugins/playlist/index.js';
 
 export interface PlayerjsOptions {
   id: string;

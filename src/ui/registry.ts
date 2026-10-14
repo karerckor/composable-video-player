@@ -1,4 +1,4 @@
-import type { Logger } from '../types';
+import type { Logger } from '../types.js';
 
 export interface Registry<T> {
   register(name: string, item: T): void;

@@ -1,7 +1,7 @@
-import type { ComponentFactory, ComponentInstance, HideRuleFactory, LayoutNode, Logger, UIContext } from '../types';
-import type { Registry } from './registry';
-import { applyBaseProps } from './base-props';
-import { compileHide } from './hide-rules';
+import type { ComponentFactory, ComponentInstance, HideRuleFactory, LayoutNode, Logger, UIContext } from '../types.js';
+import type { Registry } from './registry.js';
+import { applyBaseProps } from './base-props.js';
+import { compileHide } from './hide-rules.js';
 
 export type UIBase = Pick<UIContext, 'player' | 'store' | 'events' | 'commands' | 'options' | 'root' | 'log' | 't' | 'icon' | 'menus' | 'run'>;
 

@@ -9,29 +9,29 @@ import type {
   PluginContext,
   SourceTransform,
   ThemeVars,
-} from './types';
+} from './types.js';
 import css from './theme/player.css?inline';
-import { createLogger } from './core/logger';
-import { createStore } from './core/store';
-import { createEventBus } from './core/events';
-import { createCommandRegistry } from './core/commands';
-import { createPluginHost } from './core/plugin-host';
-import { createInitialState } from './core/initial-state';
-import { createMediaController } from './core/media-controller';
-import { html5Provider } from './providers/html5';
-import { hlsProvider } from './providers/hls';
-import { createApi } from './api/api-map';
-import { h } from './ui/dom';
-import { createRegistry } from './ui/registry';
-import { registerBuiltinHideRules } from './ui/hide-rules';
-import { createTranslator } from './ui/i18n';
-import { createIconSet } from './ui/icons';
-import { createMenuHost } from './ui/menu-host';
-import { createActionRunner } from './ui/actions';
-import { createLayoutEngine, type Mounted } from './ui/layout';
-import { controlsVisible, createUserActivity } from './ui/activity';
-import { defaultLayout } from './ui/default-layout';
-import { registerBuiltinComponents } from './components';
+import { createLogger } from './core/logger.js';
+import { createStore } from './core/store.js';
+import { createEventBus } from './core/events.js';
+import { createCommandRegistry } from './core/commands.js';
+import { createPluginHost } from './core/plugin-host.js';
+import { createInitialState } from './core/initial-state.js';
+import { createMediaController } from './core/media-controller.js';
+import { html5Provider } from './providers/html5.js';
+import { hlsProvider } from './providers/hls.js';
+import { createApi } from './api/api-map.js';
+import { h } from './ui/dom.js';
+import { createRegistry } from './ui/registry.js';
+import { registerBuiltinHideRules } from './ui/hide-rules.js';
+import { createTranslator } from './ui/i18n.js';
+import { createIconSet } from './ui/icons.js';
+import { createMenuHost } from './ui/menu-host.js';
+import { createActionRunner } from './ui/actions.js';
+import { createLayoutEngine, type Mounted } from './ui/layout.js';
+import { controlsVisible, createUserActivity } from './ui/activity.js';
+import { defaultLayout } from './ui/default-layout.js';
+import { registerBuiltinComponents } from './components/index.js';
 
 const API: CommandContext = { source: 'api' };
 let counter = 0;

@@ -1,4 +1,4 @@
-import { createIconButton, createPlayer, defaultLayout, defaultPlugins, type LayoutNode, type Player, type Plugin } from '../src/index';
+import { createIconButton, createPlayer, defaultLayout, defaultPlugins, type LayoutNode, type Player, type Plugin } from '../src/index.js';
 
 const both = (name: string) => `assets/${name}.webm or assets/${name}.mp4`;
 const players: Record<string, Player> = {};

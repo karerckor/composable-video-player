@@ -1,4 +1,4 @@
-import type { Logger, MenuHost, Player, PlayerState, Store } from '../types';
+import type { Logger, MenuHost, Player, PlayerState, Store } from '../types.js';
 
 export type Align = 'left' | 'center' | 'right';
 export type Action =

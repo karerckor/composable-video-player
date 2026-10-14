@@ -53,6 +53,9 @@ npm run assets   # generate demo media (ffmpeg)
 npm run dev      # demo at http://localhost:5173
 npm test && npm run typecheck
 npm run build    # dist/player.js (ESM), dist/player.umd.cjs, dist/types
+npm run check:types-consumer  # typecheck the packed typings from a nodenext/bundler consumer
 ```
+
+Relative imports carry explicit `.js` extensions (`tsconfig.json` uses `NodeNext` resolution, so a missing one fails typecheck).
 
 Design: `docs/superpowers/specs/2026-10-14-composable-video-player-design.md`.

@@ -1,6 +1,6 @@
-import type { CommandContext, CommandName, Plugin } from '../types';
+import type { CommandContext, CommandName, Plugin } from '../types.js';
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerOptions {
     /** `false` disables lock-screen / media keys integration. */
     mediasession?: boolean;

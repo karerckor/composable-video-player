@@ -10,7 +10,7 @@ describe('umd entry', () => {
   it('exposes window.Playerjs and calls PlayerjsAsync', async () => {
     const async = vi.fn();
     (window as unknown as { PlayerjsAsync: unknown }).PlayerjsAsync = async;
-    const mod = await import('../src/umd');
+    const mod = await import('../src/umd.js');
     expect((window as unknown as { Playerjs: unknown }).Playerjs).toBe(mod.Playerjs);
     expect(typeof mod.createPlayer).toBe('function');
     expect(async).toHaveBeenCalledTimes(1);

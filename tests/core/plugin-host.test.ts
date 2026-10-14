@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPluginHost } from '../../src/core/plugin-host';
-import { createLogger } from '../../src/core/logger';
-import type { Plugin, PluginContext } from '../../src/types';
+import { createPluginHost } from '../../src/core/plugin-host.js';
+import { createLogger } from '../../src/core/logger.js';
+import type { Plugin, PluginContext } from '../../src/types.js';
 
 const ctx = {} as PluginContext;
 

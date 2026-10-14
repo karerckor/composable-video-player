@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fnv1a } from '../../src/shared/hash';
+import { fnv1a } from '../../src/shared/hash.js';
 
 describe('fnv1a', () => {
   it('matches known 32-bit FNV-1a vectors', () => {

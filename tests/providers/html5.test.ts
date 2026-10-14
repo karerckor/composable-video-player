@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { html5Provider, hasNativeHls } from '../../src/providers/html5';
-import { createLogger } from '../../src/core/logger';
-import { installFakeMedia } from '../helpers/fake-media';
-import type { ProviderContext, SourceSpec } from '../../src/types';
+import { html5Provider, hasNativeHls } from '../../src/providers/html5.js';
+import { createLogger } from '../../src/core/logger.js';
+import { installFakeMedia } from '../helpers/fake-media.js';
+import type { ProviderContext, SourceSpec } from '../../src/types.js';
 
 const spec: SourceSpec = { qualities: [], subtitles: [] };
 const ctx = { log: createLogger(false), options: { container: 'x' }, setQualities() {}, setAudioTracks() {}, error() {} } as ProviderContext;

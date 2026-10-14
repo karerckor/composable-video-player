@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import * as vp from '../src/index';
+import * as vp from '../src/index.js';
 
 describe('public exports', () => {
   it('exposes the main entry points', () => {

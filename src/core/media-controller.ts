@@ -1,10 +1,10 @@
-import type { MediaProvider, PlayerError, ProviderContext, Selection, SourceInput, SourceSpec } from '../types';
-import type { MediaDeps } from './media-deps';
-import { isPlaylistInput, isSourceSpecInput, normalizeSpec, parseSource } from '../source/parse';
-import { toPlayerError } from '../shared/errors';
-import { clamp } from '../shared/clamp';
-import { bindMediaEvents } from './media-events';
-import { registerMediaCommands } from './media-commands';
+import type { MediaProvider, PlayerError, ProviderContext, Selection, SourceInput, SourceSpec } from '../types.js';
+import type { MediaDeps } from './media-deps.js';
+import { isPlaylistInput, isSourceSpecInput, normalizeSpec, parseSource } from '../source/parse.js';
+import { toPlayerError } from '../shared/errors.js';
+import { clamp } from '../shared/clamp.js';
+import { bindMediaEvents } from './media-events.js';
+import { registerMediaCommands } from './media-commands.js';
 
 export interface MediaController {
   readonly provider: MediaProvider | null;

@@ -1,5 +1,5 @@
-import type { EventBus, EventName } from '../types';
-import { PLAYERJS_EVENTS } from '../api/events-list';
+import type { EventBus, EventName } from '../types.js';
+import { PLAYERJS_EVENTS } from '../api/events-list.js';
 
 const PUBLIC = new Set<EventName>(PLAYERJS_EVENTS);
 

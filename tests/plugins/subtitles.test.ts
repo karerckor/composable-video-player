@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { subtitlesPlugin, type SubtitlesPluginOptions } from '../../src/plugins/subtitles';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import type { PlayerOptions } from '../../src/types';
+import { subtitlesPlugin, type SubtitlesPluginOptions } from '../../src/plugins/subtitles/index.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import type { PlayerOptions } from '../../src/types.js';
 
 const FILES: Record<string, string> = {
   'en.vtt': 'WEBVTT\n\n00:00:01.000 --> 00:00:03.000\nHello <b>world</b>',

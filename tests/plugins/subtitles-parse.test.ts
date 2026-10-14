@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activeText, cueNodes, shiftCues, shiftFromUrl } from '../../src/plugins/subtitles/parse';
+import { activeText, cueNodes, shiftCues, shiftFromUrl } from '../../src/plugins/subtitles/parse.js';
 
 const render = (text: string) => {
   const div = document.createElement('div');

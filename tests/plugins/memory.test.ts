@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { memoryPlugin, shouldRestorePosition } from '../../src/plugins/memory';
-import { speedPlugin } from '../../src/plugins/speed';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import { fnv1a } from '../../src/shared/hash';
-import type { CommandRegistry, Plugin } from '../../src/types';
+import { memoryPlugin, shouldRestorePosition } from '../../src/plugins/memory.js';
+import { speedPlugin } from '../../src/plugins/speed.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import { fnv1a } from '../../src/shared/hash.js';
+import type { CommandRegistry, Plugin } from '../../src/types.js';
 
 beforeEach(() => {
   localStorage.clear();

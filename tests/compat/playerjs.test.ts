@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Playerjs } from '../../src/compat/playerjs';
-import { installFakeMedia } from '../helpers/fake-media';
-import { flush } from '../helpers/flush';
+import { Playerjs } from '../../src/compat/playerjs.js';
+import { installFakeMedia } from '../helpers/fake-media.js';
+import { flush } from '../helpers/flush.js';
 
 let instance: Playerjs | null;
 

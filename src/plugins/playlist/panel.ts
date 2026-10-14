@@ -1,7 +1,7 @@
-import type { ComponentFactory } from '../../types';
-import { h } from '../../ui/dom';
-import { createIconButton } from '../../ui/button';
-import type { PlaylistItem, PlaylistState } from './model';
+import type { ComponentFactory } from '../../types.js';
+import { h } from '../../ui/dom.js';
+import { createIconButton } from '../../ui/button.js';
+import type { PlaylistItem, PlaylistState } from './model.js';
 
 export function playlistPanelComponent(onSelect: (index: number) => void, onClose: () => void): ComponentFactory {
   return (ctx) => {

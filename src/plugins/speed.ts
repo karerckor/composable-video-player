@@ -1,6 +1,6 @@
-import type { CommandContext, Plugin } from '../types';
+import type { CommandContext, Plugin } from '../types.js';
 
-declare module '../types' {
+declare module '../types.js' {
   interface PlayerState {
     speeds?: number[];
   }

@@ -1,10 +1,10 @@
-import type { CommandContext, Plugin, SubtitleRef } from '../../types';
-import { h } from '../../ui/dom';
-import { controlsVisible } from '../../ui/activity';
-import { parseSubtitleList } from '../../source/parse';
-import { activeText, cueNodes, parseSubtitles, shiftCues, shiftFromUrl, type Cue } from './parse';
+import type { CommandContext, Plugin, SubtitleRef } from '../../types.js';
+import { h } from '../../ui/dom.js';
+import { controlsVisible } from '../../ui/activity.js';
+import { parseSubtitleList } from '../../source/parse.js';
+import { activeText, cueNodes, parseSubtitles, shiftCues, shiftFromUrl, type Cue } from './parse.js';
 
-declare module '../../types' {
+declare module '../../types.js' {
   interface PlayerOptions {
     /** `[Label]url,[Label]url` for the first source. PlayerJS: subtitle. */
     subtitle?: string;

@@ -1,4 +1,4 @@
-import type { EventBus, EventHandler, EventName, Logger } from '../types';
+import type { EventBus, EventHandler, EventName, Logger } from '../types.js';
 
 type AnyHandler = (name: EventName, data: unknown) => void;
 

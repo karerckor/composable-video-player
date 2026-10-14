@@ -1,10 +1,10 @@
-import type { ComponentFactory } from '../types';
-import type { Registry } from '../ui/registry';
-import { groupComponent, overlayComponent, rootComponent, spacerComponent, textComponent, toolbarComponent } from './containers';
-import { bigPlayComponent, fullscreenComponent, muteComponent, playComponent, settingsComponent } from './buttons';
-import { bufferingComponent, durationComponent, errorOverlayComponent, liveComponent, mediaClickLayerComponent, timeComponent, titleComponent } from './indicators';
-import { volumeComponent } from './volume';
-import { timelineComponent } from './timeline';
+import type { ComponentFactory } from '../types.js';
+import type { Registry } from '../ui/registry.js';
+import { groupComponent, overlayComponent, rootComponent, spacerComponent, textComponent, toolbarComponent } from './containers.js';
+import { bigPlayComponent, fullscreenComponent, muteComponent, playComponent, settingsComponent } from './buttons.js';
+import { bufferingComponent, durationComponent, errorOverlayComponent, liveComponent, mediaClickLayerComponent, timeComponent, titleComponent } from './indicators.js';
+import { volumeComponent } from './volume.js';
+import { timelineComponent } from './timeline.js';
 
 export const BUILTIN_COMPONENTS: Record<string, ComponentFactory<any>> = {
   root: rootComponent,
@@ -33,8 +33,8 @@ export function registerBuiltinComponents(registry: Registry<ComponentFactory<an
   for (const [type, factory] of Object.entries(BUILTIN_COMPONENTS)) registry.register(type, factory);
 }
 
-export * from './containers';
-export * from './buttons';
-export * from './indicators';
-export * from './volume';
-export * from './timeline';
+export * from './containers.js';
+export * from './buttons.js';
+export * from './indicators.js';
+export * from './volume.js';
+export * from './timeline.js';

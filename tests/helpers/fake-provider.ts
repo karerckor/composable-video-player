@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import type { MediaProvider, PlayerError, ProviderContext } from '../../src/types';
+import type { MediaProvider, PlayerError, ProviderContext } from '../../src/types.js';
 
 export interface FakeProviderOptions {
   name?: string;

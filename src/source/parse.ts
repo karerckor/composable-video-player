@@ -1,4 +1,4 @@
-import type { SourceInput, SourceSpec, SourceSpecInput, SourceTrack, SubtitleRef } from '../types';
+import type { SourceInput, SourceSpec, SourceSpecInput, SourceTrack, SubtitleRef } from '../types.js';
 
 export interface ParseOptions {
   /** Labels for unlabeled comma-separated qualities, e.g. "480p,720p". */

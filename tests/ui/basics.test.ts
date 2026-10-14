@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { h, iconEl } from '../../src/ui/dom';
-import { createTranslator } from '../../src/ui/i18n';
-import { defaultIcons, createIconSet } from '../../src/ui/icons';
+import { h, iconEl } from '../../src/ui/dom.js';
+import { createTranslator } from '../../src/ui/i18n.js';
+import { defaultIcons, createIconSet } from '../../src/ui/icons.js';
 
 describe('h', () => {
   it('creates elements with attributes and children', () => {

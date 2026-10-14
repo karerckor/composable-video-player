@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createEventBus } from '../../src/core/events';
-import { createLogger } from '../../src/core/logger';
+import { createEventBus } from '../../src/core/events.js';
+import { createLogger } from '../../src/core/logger.js';
 
 describe('createEventBus', () => {
   it('delivers typed payloads and unsubscribes', () => {

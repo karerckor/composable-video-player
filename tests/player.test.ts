@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPlayer } from '../src/create-player';
-import { installFakeMedia } from './helpers/fake-media';
-import { fakeProvider } from './helpers/fake-provider';
-import { flush } from './helpers/flush';
-import { h } from '../src/ui/dom';
-import type { EventName, Player, Plugin } from '../src/types';
+import { createPlayer } from '../src/create-player.js';
+import { installFakeMedia } from './helpers/fake-media.js';
+import { fakeProvider } from './helpers/fake-provider.js';
+import { flush } from './helpers/flush.js';
+import { h } from '../src/ui/dom.js';
+import type { EventName, Player, Plugin } from '../src/types.js';
 
 let host: HTMLElement;
 let player: Player | null;

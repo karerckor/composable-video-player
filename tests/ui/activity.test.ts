@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createUserActivity, type UserActivity } from '../../src/ui/activity';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createInitialState } from '../../src/core/initial-state';
-import type { EventBus, PlayerState, Store } from '../../src/types';
+import { createUserActivity, type UserActivity } from '../../src/ui/activity.js';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import type { EventBus, PlayerState, Store } from '../../src/types.js';
 
 let store: Store<PlayerState>;
 let events: EventBus;

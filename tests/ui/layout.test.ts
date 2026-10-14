@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createUIHarness } from '../helpers/ui-harness';
-import { h } from '../../src/ui/dom';
-import type { ComponentFactory } from '../../src/types';
+import { createUIHarness } from '../helpers/ui-harness.js';
+import { h } from '../../src/ui/dom.js';
+import type { ComponentFactory } from '../../src/types.js';
 
 let ui: ReturnType<typeof createUIHarness>;
 

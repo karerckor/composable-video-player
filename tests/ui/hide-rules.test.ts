@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createRegistry, type Registry } from '../../src/ui/registry';
-import { compileHide, registerBuiltinHideRules } from '../../src/ui/hide-rules';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import type { HideRuleFactory, HideRuleSpec, PlayerState, UIContext } from '../../src/types';
+import { createRegistry, type Registry } from '../../src/ui/registry.js';
+import { compileHide, registerBuiltinHideRules } from '../../src/ui/hide-rules.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import type { HideRuleFactory, HideRuleSpec, PlayerState, UIContext } from '../../src/types.js';
 
 const log = createLogger(false);
 const state = (patch: Partial<PlayerState> = {}): PlayerState => ({ ...createInitialState({ container: 'x' }), ...patch });

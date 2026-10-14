@@ -1,6 +1,6 @@
-import type { ComponentFactory, IconName } from '../types';
-import { createIconButton } from '../ui/button';
-import { bindWheelVolume } from '../ui/wheel';
+import type { ComponentFactory, IconName } from '../types.js';
+import { createIconButton } from '../ui/button.js';
+import { bindWheelVolume } from '../ui/wheel.js';
 
 export const playComponent: ComponentFactory = (ctx) => {
   const b = createIconButton(ctx, 'vp-play', () => ctx.user('toggle'));

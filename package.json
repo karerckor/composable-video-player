@@ -27,6 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
+    "check:types-consumer": "npm run build && bash scripts/check-consumer.sh",
     "assets": "bash demo/scripts/make-assets.sh",
     "demo:umd": "npm run build && cp dist/player.umd.cjs demo/assets/player.umd.js && cp dist/player.umd.cjs.map demo/assets/player.umd.cjs.map"
   },

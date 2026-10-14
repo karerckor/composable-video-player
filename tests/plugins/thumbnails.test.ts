@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { findThumb, parseThumbnails } from '../../src/plugins/thumbnails/parse';
-import { thumbnailsPlugin } from '../../src/plugins/thumbnails';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
+import { findThumb, parseThumbnails } from '../../src/plugins/thumbnails/parse.js';
+import { thumbnailsPlugin } from '../../src/plugins/thumbnails/index.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
 
 const VTT = 'WEBVTT\n\n00:00.000 --> 00:05.000\nsprite.jpg#xywh=0,0,160,90\n\n00:05.000 --> 00:10.000\nsprite.jpg#xywh=160,0,160,90\n\n00:10.000 --> 00:15.000\nhttps://cdn.example/full.jpg';
 
@@ -22,12 +22,12 @@ describe('parseThumbnails / findThumb', () => {
 
 describe('thumbnailsPlugin', () => {
   const fetchMock = vi.fn(async () => new Response(VTT));
-  let bus: import('../../src/types').EventBus;
-  const grab = { name: 'grab', setup: (ctx: import('../../src/types').PluginContext) => void (bus = ctx.events) };
+  let bus: import('../../src/types.js').EventBus;
+  const grab = { name: 'grab', setup: (ctx: import('../../src/types.js').PluginContext) => void (bus = ctx.events) };
 
   beforeEach(() => fetchMock.mockClear());
 
-  const setup = (options: Partial<import('../../src/types').PlayerOptions> = { thumbnails: 'https://a.com/t.vtt' }) => {
+  const setup = (options: Partial<import('../../src/types.js').PlayerOptions> = { thumbnails: 'https://a.com/t.vtt' }) => {
     const t = createTestPlayer({ ...options, plugins: [grab, thumbnailsPlugin({ fetch: fetchMock as unknown as typeof fetch })], source: 'a.mp4' });
     const preview = () => t.host.querySelector<HTMLElement>('.vp-thumb')!;
     const image = () => t.host.querySelector<HTMLElement>('.vp-thumb-image')!;

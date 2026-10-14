@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCues } from '../../src/shared/cues';
+import { parseCues } from '../../src/shared/cues.js';
 
 describe('parseCues', () => {
   it('parses WebVTT with headers, notes, ids and settings', () => {

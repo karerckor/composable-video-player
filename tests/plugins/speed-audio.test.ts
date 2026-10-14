@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { speedPlugin } from '../../src/plugins/speed';
-import { audioTracksPlugin } from '../../src/plugins/audiotracks';
-import { createTestPlayer } from '../helpers/player-harness';
-import { flush } from '../helpers/flush';
-import type { Plugin } from '../../src/types';
+import { speedPlugin } from '../../src/plugins/speed.js';
+import { audioTracksPlugin } from '../../src/plugins/audiotracks.js';
+import { createTestPlayer } from '../helpers/player-harness.js';
+import { flush } from '../helpers/flush.js';
+import type { Plugin } from '../../src/types.js';
 
 const menuLabels = (host: HTMLElement) => [...host.querySelectorAll('.vp-menu-item .vp-menu-label')].map((e) => e.textContent);
 

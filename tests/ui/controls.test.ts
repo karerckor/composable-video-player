@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createUIHarness } from '../helpers/ui-harness';
-import { createIconButton } from '../../src/ui/button';
-import { createSlider } from '../../src/ui/slider';
-import type { UIContext } from '../../src/types';
+import { createUIHarness } from '../helpers/ui-harness.js';
+import { createIconButton } from '../../src/ui/button.js';
+import { createSlider } from '../../src/ui/slider.js';
+import type { UIContext } from '../../src/types.js';
 
 let ui: ReturnType<typeof createUIHarness>;
 let ctx: UIContext;

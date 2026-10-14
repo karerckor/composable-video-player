@@ -1,4 +1,4 @@
-import type { CommandContext, CommandRegistry, EventBus, Logger, Player, PlayerOptions, PlayerState, Store } from '../types';
+import type { CommandContext, CommandRegistry, EventBus, Logger, Player, PlayerOptions, PlayerState, Store } from '../types.js';
 
 export interface ApiContext {
   player: Player;

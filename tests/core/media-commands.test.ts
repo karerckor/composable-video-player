@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { registerMediaCommands } from '../../src/core/media-commands';
-import { bindMediaEvents } from '../../src/core/media-events';
-import { createStore } from '../../src/core/store';
-import { createEventBus } from '../../src/core/events';
-import { createCommandRegistry } from '../../src/core/commands';
-import { createLogger } from '../../src/core/logger';
-import { createInitialState } from '../../src/core/initial-state';
-import { installFakeMedia, type FakeMedia } from '../helpers/fake-media';
-import type { MediaDeps } from '../../src/core/media-deps';
-import type { EventName } from '../../src/types';
+import { registerMediaCommands } from '../../src/core/media-commands.js';
+import { bindMediaEvents } from '../../src/core/media-events.js';
+import { createStore } from '../../src/core/store.js';
+import { createEventBus } from '../../src/core/events.js';
+import { createCommandRegistry } from '../../src/core/commands.js';
+import { createLogger } from '../../src/core/logger.js';
+import { createInitialState } from '../../src/core/initial-state.js';
+import { installFakeMedia, type FakeMedia } from '../helpers/fake-media.js';
+import type { MediaDeps } from '../../src/core/media-deps.js';
+import type { EventName } from '../../src/types.js';
 
 let d: MediaDeps;
 let media: FakeMedia;
