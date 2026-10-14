@@ -1,0 +1,35 @@
+{
+  "name": "composable-video-player",
+  "version": "0.1.0",
+  "description": "Composable, extensible PlayerJS-like video player in pure TypeScript",
+  "type": "module",
+  "main": "./dist/player.umd.cjs",
+  "module": "./dist/player.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/player.js",
+      "require": "./dist/player.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build -c vite.umd.config.ts && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  }
+}
