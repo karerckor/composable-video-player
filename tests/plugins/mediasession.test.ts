@@ -2,6 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mediaSessionPlugin } from '../../src/plugins/mediasession';
 import { createTestPlayer } from '../helpers/player-harness';
 import { flush } from '../helpers/flush';
+import type { Player, PluginContext, Plugin } from '../../src/types';
+
+const created: Player[] = [];
+function make(opts: Parameters<typeof createTestPlayer>[0]) {
+  const result = createTestPlayer(opts);
+  created.push(result.player);
+  return result;
+}
 
 let handlers: Record<string, ((details?: { seekTime?: number }) => void) | null>;
 let session: { metadata: unknown; playbackState: string; setActionHandler: (name: string, fn: ((d?: { seekTime?: number }) => void) | null) => void };
@@ -24,13 +32,14 @@ beforeEach(() => {
   );
 });
 afterEach(() => {
+  created.splice(0).forEach((p) => p.destroy());
   delete (navigator as unknown as { mediaSession?: unknown }).mediaSession;
   vi.unstubAllGlobals();
 });
 
 describe('mediaSessionPlugin', () => {
   it('publishes metadata and playback state', async () => {
-    const { player } = createTestPlayer({ plugins: [mediaSessionPlugin()], title: 'Hello', poster: 'p.jpg', source: 'a.mp4' });
+    const { player } = make({ plugins: [mediaSessionPlugin()], title: 'Hello', poster: 'p.jpg', source: 'a.mp4' });
     await flush();
     expect((session.metadata as { init: unknown }).init).toEqual({ title: 'Hello', artwork: [{ src: 'p.jpg' }] });
     await player.play();
@@ -40,7 +49,7 @@ describe('mediaSessionPlugin', () => {
   });
 
   it('routes action handlers to commands and clears them on destroy', async () => {
-    const { player, media } = createTestPlayer({ plugins: [mediaSessionPlugin()], source: 'a.mp4' });
+    const { player, media } = make({ plugins: [mediaSessionPlugin()], source: 'a.mp4' });
     await flush();
     media.setDuration(100);
     handlers.play!();
@@ -59,6 +68,48 @@ describe('mediaSessionPlugin', () => {
 
   it('does nothing without the API or when disabled', () => {
     delete (navigator as unknown as { mediaSession?: unknown }).mediaSession;
-    expect(() => createTestPlayer({ plugins: [mediaSessionPlugin()] })).not.toThrow();
+    expect(() => make({ plugins: [mediaSessionPlugin()] })).not.toThrow();
+  });
+
+  it('is disabled by mediasession: false', async () => {
+    make({ plugins: [mediaSessionPlugin()], mediasession: false, source: 'a.mp4' });
+    await flush();
+    expect(handlers.play).toBeUndefined();
+    expect(session.metadata).toBeNull();
+  });
+
+  it('keeps the previous playback state while buffering', async () => {
+    let store!: PluginContext['store'];
+    const grab: Plugin = { name: 'grab', setup: (ctx) => void (store = ctx.store) };
+    const { player, media } = make({ plugins: [mediaSessionPlugin(), grab], source: 'a.mp4' });
+    await flush();
+    media.setDuration(100);
+    await player.play();
+    expect(session.playbackState).toBe('playing');
+    store.set({ status: 'loading' });
+    expect(player.state.status).toBe('loading');
+    expect(session.playbackState).toBe('playing');
+  });
+
+  it('hands ownership to the player that plays last', async () => {
+    const a = make({ plugins: [mediaSessionPlugin()], source: 'a.mp4' });
+    await flush();
+    const b = make({ plugins: [mediaSessionPlugin()], source: 'b.mp4' });
+    await flush();
+    a.media.setDuration(100);
+    b.media.setDuration(100);
+    handlers.play!();
+    await flush();
+    expect(a.player.state.status).toBe('playing');
+    await b.player.play();
+    expect(session.playbackState).toBe('playing');
+    handlers.pause!();
+    expect(b.player.state.status).toBe('paused');
+    expect(a.player.state.status).toBe('playing');
+    a.player.destroy();
+    expect(handlers.play).not.toBeNull();
+    b.player.destroy();
+    expect(handlers.play).toBeNull();
+    expect(session.metadata).toBeNull();
   });
 });

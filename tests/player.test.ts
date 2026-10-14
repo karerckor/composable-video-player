@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPlayer } from '../src/player';
+import { createPlayer } from '../src/create-player';
 import { installFakeMedia } from './helpers/fake-media';
 import { fakeProvider } from './helpers/fake-provider';
 import { flush } from './helpers/flush';

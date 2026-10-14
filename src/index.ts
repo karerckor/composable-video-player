@@ -1,5 +1,6 @@
 export type * from './types';
-export { createPlayer } from './player';
+export { createPlayer } from './create-player';
+export { createPlayerCore } from './player';
 export { defaultLayout } from './ui/default-layout';
 export * from './components';
 export { html5Provider, hasNativeHls } from './providers/html5';

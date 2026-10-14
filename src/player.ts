@@ -31,7 +31,6 @@ import { createLayoutEngine, type Mounted } from './ui/layout';
 import { controlsVisible, createUserActivity } from './ui/activity';
 import { defaultLayout } from './ui/default-layout';
 import { registerBuiltinComponents } from './components';
-import { defaultPlugins } from './plugins';
 
 const API: CommandContext = { source: 'api' };
 let counter = 0;
@@ -65,7 +64,8 @@ function applyTheme(root: HTMLElement, theme: Partial<ThemeVars> = {}): void {
   }
 }
 
-export function createPlayer(options: PlayerOptions): Player {
+/** Composition root without default plugins: `options.plugins` defaults to `[]` (tree-shakable). */
+export function createPlayerCore(options: PlayerOptions): Player {
   // 1. DOM skeleton
   const container = resolveContainer(options.container);
   if (!container.id) container.id = `vp${++counter}`;
@@ -190,7 +190,7 @@ export function createPlayer(options: PlayerOptions): Player {
 
   // 6. Plugins
   const pluginHost = createPluginHost(log);
-  pluginHost.setupAll(options.plugins ?? defaultPlugins(), pluginContext);
+  pluginHost.setupAll(options.plugins ?? [], pluginContext);
 
   // 7. Layout
   let layout: Mounted | null = null;

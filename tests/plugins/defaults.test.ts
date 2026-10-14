@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultPlugins } from '../../src/plugins';
-import { createPlayer } from '../../src/player';
+import { createPlayer } from '../../src/create-player';
+import { createPlayerCore } from '../../src/player';
 import * as vp from '../../src/index';
 import { createTestPlayer } from '../helpers/player-harness';
 import { flush } from '../helpers/flush';
@@ -25,6 +26,15 @@ describe('defaultPlugins', () => {
     expect(host.querySelector('.vp-thumb')).not.toBeNull();
     expect(host.querySelector('.vp-playlist')).not.toBeNull();
     player.destroy();
+  });
+
+  it('createPlayerCore has no plugins unless given', () => {
+    document.body.replaceChildren();
+    const host = document.body.appendChild(document.createElement('div'));
+    const player = createPlayerCore({ container: host });
+    expect(host.querySelector('.vp-playlist')).toBeNull();
+    player.destroy();
+    expect(typeof vp.createPlayerCore).toBe('function');
   });
 
   it('works together end to end', async () => {

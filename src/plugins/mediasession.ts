@@ -11,6 +11,9 @@ type Handler = (details?: { seekTime?: number; seekOffset?: number }) => void;
 const USER: CommandContext = { source: 'user' };
 const ACTIONS = ['play', 'pause', 'seekto', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack'] as const;
 
+/** The plugin instance (player) that currently controls the page-wide media session. */
+let owner: object | null = null;
+
 export function mediaSessionPlugin(): Plugin {
   return {
     name: 'mediasession',
@@ -39,32 +42,56 @@ export function mediaSessionPlugin(): Plugin {
           /* action not supported by this browser */
         }
       };
-      for (const name of ACTIONS) setHandler(name, handlers[name]);
+      const token = {};
+      let lastState: MediaSessionPlaybackState = 'none';
+
+      const publishMetadata = () => {
+        if (owner !== token) return;
+        const s = ctx.store.get();
+        try {
+          session.metadata = new MediaMetadata({ title: s.title, artwork: s.poster ? [{ src: s.poster }] : [] });
+        } catch {
+          /* MediaMetadata missing */
+        }
+      };
+      const publishState = () => {
+        if (owner === token) session.playbackState = lastState;
+      };
+      const claim = () => {
+        if (owner === token) return;
+        owner = token;
+        for (const name of ACTIONS) setHandler(name, handlers[name]);
+        publishMetadata();
+        publishState();
+      };
+      if (owner === null) claim();
 
       const offs = [
-        ctx.store.select(
-          (s) => `${s.title}\n${s.poster}`,
-          () => {
-            const s = ctx.store.get();
-            try {
-              session.metadata = new MediaMetadata({ title: s.title, artwork: s.poster ? [{ src: s.poster }] : [] });
-            } catch {
-              /* MediaMetadata missing */
-            }
-          },
-          { immediate: true },
-        ),
+        ctx.events.on('play', claim),
+        ctx.store.select((s) => `${s.title}\n${s.poster}`, publishMetadata, { immediate: true }),
         ctx.store.select(
           (s) => s.status,
           (status) => {
-            session.playbackState = status === 'playing' ? 'playing' : status === 'paused' || status === 'ended' ? 'paused' : 'none';
+            // 'loading' (buffering, source switch) keeps the previous state so the lock screen doesn't flicker.
+            if (status === 'playing') lastState = 'playing';
+            else if (status === 'paused' || status === 'ended') lastState = 'paused';
+            else if (status !== 'loading') lastState = 'none';
+            publishState();
           },
           { immediate: true },
         ),
       ];
       return () => {
         offs.forEach((off) => off());
+        if (owner !== token) return;
         for (const name of ACTIONS) setHandler(name, null);
+        try {
+          session.metadata = null;
+        } catch {
+          /* ignore */
+        }
+        session.playbackState = 'none';
+        owner = null;
       };
     },
   };

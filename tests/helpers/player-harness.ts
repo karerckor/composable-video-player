@@ -1,4 +1,4 @@
-import { createPlayer } from '../../src/player';
+import { createPlayerCore as createPlayer } from '../../src/player';
 import { installFakeMedia, type FakeMedia } from './fake-media';
 import { fakeProvider, type FakeProviderOptions } from './fake-provider';
 import type { PlayerOptions, Plugin } from '../../src/types';

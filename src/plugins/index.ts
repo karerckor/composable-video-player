@@ -13,6 +13,7 @@ import { mediaSessionPlugin } from './mediasession';
 /**
  * All v1 plugins. Order matters:
  * - memory after quality/speed/subtitles/audiotracks (its transforms and init run later, so saved values win);
+ * - memory precedes autoplay so saved mute/position are restored before autoplay plays;
  * - mediasession after playlist (prev/next commands must exist at setup).
  */
 export function defaultPlugins(): Plugin[] {
