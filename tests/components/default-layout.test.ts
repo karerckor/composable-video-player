@@ -47,4 +47,8 @@ describe('default layout', () => {
   it('collapses hidden controls inside toolbar rows instead of keeping their space', () => {
     expect(css).toMatch(/\.vp-group\s*>\s*\.vp-hidden\s*\{[^}]*display:\s*none/);
   });
+
+  it('clips the root so focus cannot scroll off-canvas panels into view', () => {
+    expect(css).toMatch(/\.vp-root\s*\{[^}]*overflow:\s*clip/);
+  });
 });

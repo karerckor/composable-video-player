@@ -17,6 +17,8 @@
   position: relative;
   width: 100%;
   overflow: hidden;
+  /* clip, unlike hidden, can't be scrolled by focus — off-canvas panels (playlist) stay put. */
+  overflow: clip;
   background: #000;
   color: var(--vp-color-2);
   font-family: var(--vp-font);
