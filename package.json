@@ -20,7 +20,7 @@
     "*.css"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite demo --config vite.config.ts",
     "build": "vite build && vite build -c vite.umd.config.ts && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",

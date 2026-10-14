@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Composable Video Player — demo</title>
+    <link rel="icon" href="data:," />
+    <style>
+      body { margin: 0; padding: 24px; background: #f4f4f5; font-family: system-ui, sans-serif; color: #18181b; }
+      main { max-width: 960px; margin: 0 auto; display: grid; gap: 32px; }
+      h1 { font-size: 22px; margin: 0; }
+      h2 { font-size: 16px; margin: 0 0 8px; }
+      .log { font: 12px/1.4 ui-monospace, monospace; background: #18181b; color: #a1a1aa; padding: 8px; height: 96px; overflow: auto; border-radius: 6px; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Composable Video Player</h1>
+      <section>
+        <h2>Basic (mp4)</h2>
+        <div id="basic"></div>
+        <div class="log" id="basic-log"></div>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
