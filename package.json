@@ -17,7 +17,9 @@
     "dist"
   ],
   "sideEffects": [
-    "*.css"
+    "*.css",
+    "./dist/player.umd.cjs",
+    "./src/umd.ts"
   ],
   "scripts": {
     "dev": "vite demo --config vite.config.ts",

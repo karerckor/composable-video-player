@@ -26,6 +26,35 @@ describe('bridgeEvents', () => {
     expect(global).toHaveBeenCalledTimes(1);
   });
 
+  it('delivers init to PlayerjsEvents and the DOM asynchronously, other events synchronously', async () => {
+    const bus = createEventBus();
+    const container = document.createElement('div');
+    const global = vi.fn();
+    (window as unknown as { PlayerjsEvents: unknown }).PlayerjsEvents = global;
+    const dom = vi.fn();
+    container.addEventListener('init', dom);
+    bridgeEvents(bus, container, 'player');
+    bus.emit('init');
+    expect(global).not.toHaveBeenCalled();
+    expect(dom).not.toHaveBeenCalled();
+    await Promise.resolve();
+    expect(global).toHaveBeenCalledWith('init', 'player', undefined);
+    expect(dom).toHaveBeenCalledTimes(1);
+    bus.emit('play');
+    expect(global).toHaveBeenCalledTimes(2);
+  });
+
+  it('drops a pending init when the bridge is removed first', async () => {
+    const bus = createEventBus();
+    const global = vi.fn();
+    (window as unknown as { PlayerjsEvents: unknown }).PlayerjsEvents = global;
+    const off = bridgeEvents(bus, document.createElement('div'), 'player');
+    bus.emit('init');
+    off();
+    await Promise.resolve();
+    expect(global).not.toHaveBeenCalled();
+  });
+
   it('survives a throwing PlayerjsEvents', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const bus = createEventBus();
@@ -59,7 +88,46 @@ describe('bridgePostMessage', () => {
     send({ api: 'time' });
     expect(api).toHaveBeenNthCalledWith(1, 'volume', 0.5);
     expect(api).toHaveBeenNthCalledWith(2, 'time');
-    expect(parent.postMessage).toHaveBeenCalledWith({ event: 'time', answer: 12 }, 'https://host');
+    expect(parent.postMessage).toHaveBeenCalledWith({ event: 'time', answer: 12, id: 'p' }, 'https://host');
+  });
+
+  it('does not let a throwing api escape the listener', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { win, send } = fakeWindow();
+    bridgePostMessage({
+      api: () => {
+        throw new Error('boom');
+      },
+      events: createEventBus(),
+      id: 'p',
+      win,
+    });
+    expect(() => send({ api: 'play' })).not.toThrow();
+    expect(warn).toHaveBeenCalledWith('[vp]', expect.stringContaining('postMessage'), expect.anything());
+    warn.mockRestore();
+  });
+
+  it('catches answers that cannot be posted', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { win, parent, send } = fakeWindow();
+    parent.postMessage.mockImplementation(() => {
+      throw new Error('DataCloneError');
+    });
+    bridgePostMessage({ api: () => () => {}, events: createEventBus(), id: 'p', win });
+    expect(() => send({ api: 'getter' })).not.toThrow();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('ignores messages addressed to another player id', () => {
+    const { win, send } = fakeWindow();
+    const api = vi.fn();
+    bridgePostMessage({ api, events: createEventBus(), id: 'p', win });
+    send({ api: 'play', id: 'other' });
+    expect(api).not.toHaveBeenCalled();
+    send({ api: 'play', id: 'p' });
+    send({ api: 'play' });
+    expect(api).toHaveBeenCalledTimes(2);
   });
 
   it('ignores other sources, wrong origins and malformed messages', () => {

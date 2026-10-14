@@ -20,11 +20,16 @@ export function bridgePostMessage(o: PostMessageBridgeOptions): () => void {
   const onMessage = (e: MessageEvent) => {
     if (e.source !== parent) return;
     if (o.origin && e.origin !== o.origin) return;
-    const data = e.data as { api?: unknown; set?: unknown } | null;
+    const data = e.data as { api?: unknown; set?: unknown; id?: unknown } | null;
     if (!data || typeof data !== 'object' || typeof data.api !== 'string') return;
-    const answer = 'set' in data ? o.api(data.api, data.set) : o.api(data.api);
-    if (answer !== undefined && !(answer instanceof Promise)) {
-      (e.source as Window).postMessage({ event: data.api, answer }, !e.origin || e.origin === 'null' ? '*' : e.origin);
+    if (typeof data.id === 'string' && data.id !== o.id) return;
+    try {
+      const answer = 'set' in data ? o.api(data.api, data.set) : o.api(data.api);
+      if (answer !== undefined && !(answer instanceof Promise)) {
+        (e.source as Window).postMessage({ event: data.api, answer, id: o.id }, !e.origin || e.origin === 'null' ? '*' : e.origin);
+      }
+    } catch (err) {
+      console.warn('[vp]', `postMessage command "${data.api}" failed`, err);
     }
   };
   win.addEventListener('message', onMessage as EventListener);

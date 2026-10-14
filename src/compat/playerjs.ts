@@ -22,15 +22,26 @@ export class Playerjs {
       setup(ctx) {
         const offs: Array<() => void> = [bridgeEvents(ctx.events, ctx.player.container, ctx.player.id)];
         if (flag(opts.postmessage)) {
+          if (!opts.postmessageOrigin) {
+            ctx.log.warn('Playerjs: postmessage is enabled without postmessageOrigin, so any embedding page can control the player; set postmessageOrigin to restrict it');
+          }
           offs.push(bridgePostMessage({ api: (cmd, arg) => ctx.player.api(cmd, arg), events: ctx.events, id: ctx.player.id, origin: opts.postmessageOrigin }));
         }
         if (typeof opts.ready === 'string') {
           const name = opts.ready;
+          let active = true;
+          offs.push(() => {
+            active = false;
+          });
           offs.push(
             ctx.events.once('init', () => {
-              const fn = (window as unknown as Record<string, unknown>)[name];
-              if (typeof fn === 'function') fn(ctx.player.id);
-              else ctx.log.warn(`Playerjs: ready function "${name}" not found`);
+              // After the constructor returned, so `ready` can use `var player = new Playerjs(...)`.
+              queueMicrotask(() => {
+                if (!active) return;
+                const fn = (window as unknown as Record<string, unknown>)[name];
+                if (typeof fn === 'function') fn(ctx.player.id);
+                else ctx.log.warn(`Playerjs: ready function "${name}" not found`);
+              });
             }),
           );
         }
