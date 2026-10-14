@@ -66,4 +66,28 @@ describe('createCommandRegistry', () => {
     expect(reg.run('toggle', [])).toBeUndefined();
     expect(console.error).toHaveBeenCalled();
   });
+
+  it('returns the original rejected promise to the caller', async () => {
+    const reg = createCommandRegistry(createLogger(false));
+    const err = new Error('nope');
+    reg.register('play', () => Promise.reject(err));
+    const p = reg.run('play', []);
+    await expect(p).rejects.toBe(err);
+  });
+
+  it('does not leave an ignored rejection unhandled', async () => {
+    const spy = vi.fn();
+    // @types/node is not installed; reach process through globalThis.
+    const proc = (globalThis as unknown as { process: { on(e: string, f: () => void): void; off(e: string, f: () => void): void } }).process;
+    proc.on('unhandledRejection', spy);
+    try {
+      const reg = createCommandRegistry(createLogger(false));
+      reg.register('play', () => Promise.reject(new Error('ignored')));
+      reg.run('play', []);
+      for (let i = 0; i < 3; i++) await new Promise((r) => setTimeout(r, 0));
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      proc.off('unhandledRejection', spy);
+    }
+  });
 });

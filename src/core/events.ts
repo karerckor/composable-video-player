@@ -5,6 +5,7 @@ type AnyHandler = (name: EventName, data: unknown) => void;
 export function createEventBus(log?: Logger): EventBus {
   const handlers = new Map<EventName, Set<(data: unknown) => void>>();
   const anyHandlers = new Set<AnyHandler>();
+  const onceWrappers = new Map<unknown, (data: unknown) => void>();
 
   const safe = (fn: () => void, name: EventName) => {
     try {
@@ -25,14 +26,22 @@ export function createEventBus(log?: Logger): EventBus {
     once(name, cb) {
       const wrapper = ((data: unknown) => {
         off();
+        onceWrappers.delete(cb);
         (cb as (data: unknown) => void)(data);
       }) as EventHandler<typeof name>;
       const off = bus.on(name, wrapper);
-      return off;
+      onceWrappers.set(cb, wrapper as (data: unknown) => void);
+      return () => {
+        off();
+        if (onceWrappers.get(cb) === wrapper) onceWrappers.delete(cb);
+      };
     },
 
     off(name, cb) {
-      handlers.get(name)?.delete(cb as (data: unknown) => void);
+      const set = handlers.get(name);
+      set?.delete(cb as (data: unknown) => void);
+      const wrapper = onceWrappers.get(cb);
+      if (wrapper && set?.delete(wrapper)) onceWrappers.delete(cb);
     },
 
     emit(name, ...args) {

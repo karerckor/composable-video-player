@@ -41,6 +41,14 @@ describe('parseSource', () => {
     ]);
   });
 
+  it('extracts comma-separated inline subtitles without trailing commas', () => {
+    const spec = parseSource('a.mp4(subtitle:[Eng]a.vtt,[Rus]b.vtt)');
+    expect(spec.subtitles).toEqual([
+      { label: 'Eng', url: 'a.vtt' },
+      { label: 'Rus', url: 'b.vtt' },
+    ]);
+  });
+
   it('extracts the [seek:N] suffix as start', () => {
     const spec = parseSource('//a/v.mp4[seek:10]');
     expect(spec.start).toBe(10);

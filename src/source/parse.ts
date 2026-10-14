@@ -7,7 +7,7 @@ export interface ParseOptions {
 }
 
 const SUBTITLE_PREFIX = '(subtitle:';
-const PAIR_RE = /\[([^\]]*)\]([^[]+)/g;
+const PAIR_RE = /\[([^\]]*)\]([^[,]+)/g;
 const SEEK_RE = /\[seek:(\d+(?:\.\d+)?)\]$/;
 
 function takeLabel(part: string, open: string, close: string): [string, string] {

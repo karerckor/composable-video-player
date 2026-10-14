@@ -49,7 +49,12 @@ export function createCommandRegistry(log: Logger): CommandRegistry {
         if (Array.isArray(result)) current = result;
       }
       try {
-        return handler(current, ctx) as any;
+        const result = handler(current, ctx);
+        // Keep returning the original promise, but never leave it unhandled.
+        if (result && typeof (result as Promise<unknown>).catch === 'function') {
+          (result as Promise<unknown>).catch((e) => log.debug(`command "${name}" rejected`, e));
+        }
+        return result as any;
       } catch (e) {
         log.error(`command "${name}" failed`, e);
         return undefined;

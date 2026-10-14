@@ -35,6 +35,15 @@ describe('createEventBus', () => {
     expect(b).not.toHaveBeenCalled();
   });
 
+  it('off removes a listener added with once', () => {
+    const bus = createEventBus();
+    const cb = vi.fn();
+    bus.once('pause', cb);
+    bus.off('pause', cb);
+    bus.emit('pause');
+    expect(cb).not.toHaveBeenCalled();
+  });
+
   it('off removes a handler', () => {
     const bus = createEventBus();
     const cb = vi.fn();
