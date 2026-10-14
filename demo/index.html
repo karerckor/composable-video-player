@@ -7,20 +7,66 @@
     <link rel="icon" href="data:," />
     <style>
       body { margin: 0; padding: 24px; background: #f4f4f5; font-family: system-ui, sans-serif; color: #18181b; }
-      main { max-width: 960px; margin: 0 auto; display: grid; gap: 32px; }
-      h1 { font-size: 22px; margin: 0; }
-      h2 { font-size: 16px; margin: 0 0 8px; }
-      .log { font: 12px/1.4 ui-monospace, monospace; background: #18181b; color: #a1a1aa; padding: 8px; height: 96px; overflow: auto; border-radius: 6px; margin-top: 8px; }
+      main { max-width: 960px; margin: 0 auto; display: grid; gap: 40px; }
+      h1 { font-size: 24px; margin: 0; }
+      h2 { font-size: 16px; margin: 0 0 4px; }
+      p { margin: 0 0 10px; color: #52525b; font-size: 14px; }
+      code { background: #e4e4e7; padding: 1px 4px; border-radius: 4px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      button.demo { padding: 6px 10px; border-radius: 6px; border: 1px solid #d4d4d8; background: #fff; cursor: pointer; }
+      #log { position: sticky; bottom: 0; font: 12px/1.4 ui-monospace, monospace; background: #18181b; color: #a1a1aa; padding: 8px; height: 120px; overflow: auto; border-radius: 6px; }
+      #log b { color: #e4e4e7; font-weight: 600; }
     </style>
   </head>
   <body>
     <main>
       <h1>Composable Video Player</h1>
+
       <section>
-        <h2>Basic (mp4)</h2>
-        <div id="basic"></div>
-        <div class="log" id="basic-log"></div>
+        <h2>1. Qualities, subtitles, thumbnails</h2>
+        <p><code>[360p]…,[720p]…</code> + <code>subtitle</code> (VTT + SRT) + sprite <code>thumbnails</code>. Settings menu, hotkeys, memory.</p>
+        <div id="p-basic"></div>
       </section>
+
+      <section>
+        <h2>2. Audio tracks</h2>
+        <p><code>{English}…;{Русский}…</code> — separate files per language (440 Hz vs 660 Hz tone).</p>
+        <div id="p-audio"></div>
+      </section>
+
+      <section>
+        <h2>3. HLS</h2>
+        <p>Adaptive stream via lazily loaded hls.js (native in Safari). Qualities come from the manifest, with “Авто”.</p>
+        <div id="p-hls"></div>
+        <div class="row">
+          <button class="demo" data-hls="assets/hls/master.m3u8">Local HLS</button>
+          <button class="demo" data-hls="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">Mux test stream</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>4. Playlist with folders</h2>
+        <p>JSON playlist URL, panel open, autonext, prev/next buttons.</p>
+        <div id="p-playlist"></div>
+      </section>
+
+      <section>
+        <h2>5. Extensibility: custom plugin, custom layout, theme</h2>
+        <p>A plugin registers a <code>skip10</code> component; the layout is a modified copy of <code>defaultLayout</code>; an action string <code>api:seek,-10</code> drives a text button.</p>
+        <div id="p-custom"></div>
+      </section>
+
+      <section>
+        <h2>6. Fallback and errors</h2>
+        <p>Left: <code>missing.mp4 or video-360</code> (falls back). Right: a missing file (error overlay with retry).</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <div id="p-fallback"></div>
+          <div id="p-error"></div>
+        </div>
+      </section>
+
+      <p><a href="./compat.html">PlayerJS compat page (UMD bundle) →</a></p>
+      <div id="log"></div>
     </main>
     <script type="module" src="./main.ts"></script>
   </body>
