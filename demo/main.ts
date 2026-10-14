@@ -1,4 +1,5 @@
 import { createIconButton, createPlayer, defaultLayout, defaultPlugins, type LayoutNode, type Player, type Plugin } from '../src/index.js';
+import { setupCustomization } from './customization.js';
 
 const both = (name: string) => `assets/${name}.webm or assets/${name}.mp4`;
 const players: Record<string, Player> = {};
@@ -85,6 +86,9 @@ track(
 // 6. Fallback and errors
 track('fallback', createPlayer({ container: 'p-fallback', source: `assets/missing.mp4 or ${both('video-360')}`, title: 'Fallback' }));
 track('error', createPlayer({ container: 'p-error', source: 'assets/missing.mp4', title: 'Error' }));
+
+// 7–8. Layout gallery and theme builder
+setupCustomization(track);
 
 function structuredCloneLayout(node: LayoutNode): LayoutNode {
   return JSON.parse(JSON.stringify(node)) as LayoutNode;

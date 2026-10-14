@@ -16,6 +16,16 @@
       button.demo { padding: 6px 10px; border-radius: 6px; border: 1px solid #d4d4d8; background: #fff; cursor: pointer; }
       #log { position: sticky; bottom: 0; font: 12px/1.4 ui-monospace, monospace; background: #18181b; color: #a1a1aa; padding: 8px; height: 120px; overflow: auto; border-radius: 6px; }
       #log b { color: #e4e4e7; font-weight: 600; }
+      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .grid-2 h3 { font-size: 13px; margin: 0 0 6px; color: #3f3f46; }
+      .status { font: 12px ui-monospace, monospace; color: #52525b; align-self: center; }
+      .theme-builder { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items: start; }
+      #theme-controls { display: grid; gap: 8px; font-size: 13px; }
+      #theme-controls label { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; }
+      #theme-code { margin: 10px 0 0; padding: 10px; border-radius: 6px; background: #18181b; color: #e4e4e7; font: 12px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+      /* Layout node classNames: two classes so they win over the player's injected styles. */
+      .vp-root .demo-pill { gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); }
+      .vp-root .demo-solid-bar { padding: 4px 8px; }
     </style>
   </head>
   <body>
@@ -62,6 +72,55 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
           <div id="p-fallback"></div>
           <div id="p-error"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>7. Layout gallery</h2>
+        <p>Four interfaces over the same core — each is just a different <code>layout</code> tree (see <code>demo/customization.ts</code>).</p>
+        <div class="grid-2">
+          <div><h3>Minimal — play, timeline, fullscreen</h3><div id="p-l-minimal"></div></div>
+          <div><h3>Mobile — centered <code>−10 / play / +10</code>, settings top-right</h3><div id="p-l-mobile"></div></div>
+          <div><h3>Classic — always-visible solid bar, <code>{time}</code> text templates</h3><div id="p-l-classic"></div></div>
+          <div>
+            <h3>Headless — <code>layout: false</code>, page buttons call <code>player.api()</code></h3>
+            <div id="p-l-headless"></div>
+            <div class="row">
+              <button class="demo" data-headless="toggle">Play / pause</button>
+              <button class="demo" data-headless="seek,-10">−10 s</button>
+              <button class="demo" data-headless="seek,+10">+10 s</button>
+              <button class="demo" data-headless="mute">Mute</button>
+              <button class="demo" data-headless="unmute">Unmute</button>
+              <span class="status" id="headless-status"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>8. Theme builder</h2>
+        <p>Theme options are CSS variables on <code>.vp-root</code>, so they can change live without recreating the player. Copy the generated object into <code>createPlayer({ theme })</code>.</p>
+        <div class="theme-builder">
+          <div id="p-theme"></div>
+          <div>
+            <div class="row" style="margin: 0 0 10px">
+              <button class="demo" data-preset="default">По умолчанию</button>
+              <button class="demo" data-preset="light">Светлая</button>
+              <button class="demo" data-preset="neon">Неон</button>
+              <button class="demo" data-preset="retro">Ретро</button>
+            </div>
+            <div id="theme-controls">
+              <label>color1 <input type="color" data-key="color1" /></label>
+              <label>color2 <input type="color" data-key="color2" /></label>
+              <label>color3 <input type="color" data-key="color3" /></label>
+              <label>radius <input type="range" min="0" max="24" data-key="radius" data-unit="px" /></label>
+              <label>iconSize <input type="range" min="16" max="36" data-key="iconSize" data-unit="px" /></label>
+              <label>timelineHeight <input type="range" min="2" max="12" data-key="timelineHeight" data-unit="px" /></label>
+              <label>fontSize <input type="range" min="11" max="18" data-key="fontSize" data-unit="px" /></label>
+              <label>subSize <input type="range" min="1" max="2.4" step="0.1" data-key="subSize" data-unit="em" /></label>
+            </div>
+            <pre id="theme-code"></pre>
+          </div>
         </div>
       </section>
 
