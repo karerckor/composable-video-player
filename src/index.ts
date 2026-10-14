@@ -13,3 +13,6 @@ export { defaultIcons } from './ui/icons';
 export { dictionaries } from './ui/i18n';
 export { formatTime } from './shared/time';
 export * from './plugins';
+export { Playerjs } from './compat/playerjs';
+export type { PlayerjsOptions } from './compat/playerjs';
+export { mapPlayerjsOptions } from './compat/options';
