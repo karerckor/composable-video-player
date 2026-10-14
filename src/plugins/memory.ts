@@ -1,5 +1,6 @@
 import type { CommandContext, Plugin } from '../types';
 import { sourceKey } from '../source/parse';
+import { fnv1a } from '../shared/hash';
 
 export interface MemoryOptions {
   position?: boolean;
@@ -8,6 +9,8 @@ export interface MemoryOptions {
   speed?: boolean;
   subtitle?: boolean;
   audio?: boolean;
+  /** How many saved positions to keep (oldest are evicted). Default 100. */
+  maxPositions?: number;
   /** Defaults to window.localStorage; `null` disables persistence. */
   storage?: Storage | null;
 }
@@ -34,6 +37,8 @@ const KEYS = {
   audio: 'vp:audio',
   subtitle: 'vp:subtitle',
 } as const;
+const INDEX_KEY = 'vp:t:index';
+const DEFAULT_MAX_POSITIONS = 100;
 const SAVE_EVERY_SECONDS = 5;
 
 /**
@@ -110,11 +115,32 @@ export function memoryPlugin(o: MemoryOptions = {}): Plugin {
       let positionKey: string | null = null;
       let lastSaved = -Infinity;
 
+      const maxPositions = Math.max(1, Math.floor(cfg.maxPositions ?? DEFAULT_MAX_POSITIONS));
+      const readIndex = (): string[] => {
+        try {
+          const value: unknown = JSON.parse(get(INDEX_KEY) ?? '[]');
+          return Array.isArray(value) ? value.filter((k): k is string => typeof k === 'string') : [];
+        } catch {
+          return [];
+        }
+      };
+      const writeIndex = (index: string[]) => set(INDEX_KEY, JSON.stringify(index));
+
       const savePosition = () => {
         const s = ctx.store.get();
         if (!positionKey || s.live || !(s.currentTime > 0)) return;
         lastSaved = s.currentTime;
         set(positionKey, JSON.stringify({ t: s.currentTime, d: s.duration }));
+        const index = readIndex().filter((k) => k !== positionKey);
+        index.push(positionKey);
+        while (index.length > maxPositions) remove(index.shift()!);
+        writeIndex(index);
+      };
+      const forgetPosition = () => {
+        if (!positionKey) return;
+        remove(positionKey);
+        const index = readIndex();
+        if (index.includes(positionKey)) writeIndex(index.filter((k) => k !== positionKey));
       };
 
       const offs: Array<() => void> = [
@@ -133,7 +159,8 @@ export function memoryPlugin(o: MemoryOptions = {}): Plugin {
 
         ctx.addSourceTransform((spec, sel) => {
           let next = sel;
-          const id = ctx.store.get().cuid ?? `${location.pathname}#${ctx.player.id}#${sourceKey(spec)}`;
+          const cuid = ctx.store.get().cuid;
+          const id = cuid ?? `h${fnv1a(`${location.pathname}#${ctx.player.id}#${sourceKey(spec)}`)}`;
           positionKey = cfg.position ? `vp:t:${id}` : null;
           lastSaved = -Infinity;
           if (positionKey) {
@@ -158,9 +185,7 @@ export function memoryPlugin(o: MemoryOptions = {}): Plugin {
           if (Math.abs(t - lastSaved) >= SAVE_EVERY_SECONDS) savePosition();
         }),
         ctx.events.on('pause', savePosition),
-        ctx.events.on('end', () => {
-          if (positionKey) remove(positionKey);
-        }),
+        ctx.events.on('end', forgetPosition),
 
         ctx.events.on('volume', (v) => {
           if (cfg.volume) set(KEYS.volume, String(v));

@@ -3,6 +3,7 @@ import { memoryPlugin, shouldRestorePosition } from '../../src/plugins/memory';
 import { speedPlugin } from '../../src/plugins/speed';
 import { createTestPlayer } from '../helpers/player-harness';
 import { flush } from '../helpers/flush';
+import { fnv1a } from '../../src/shared/hash';
 import type { CommandRegistry, Plugin } from '../../src/types';
 
 beforeEach(() => {
@@ -145,7 +146,8 @@ describe('memoryPlugin position', () => {
     await flush();
     media.setDuration(100);
     media.timeTo(20);
-    expect(localStorage.getItem(`vp:t:${location.pathname}#p#a.mp4`)).not.toBeNull();
+    expect(localStorage.getItem(`vp:t:h${fnv1a(`${location.pathname}#p#a.mp4`)}`)).not.toBeNull();
+    expect(Object.keys(localStorage).some((k) => k.includes('a.mp4'))).toBe(false);
     player.command('setCuid', 'custom');
     expect(player.state.cuid).toBe('custom');
     expect(player.api('cuid')).toBe('custom');
@@ -157,5 +159,42 @@ describe('memoryPlugin position', () => {
     media.setDuration(Infinity);
     media.timeTo(50);
     expect(localStorage.getItem('vp:t:live')).toBeNull();
+  });
+});
+
+describe('memoryPlugin bounded storage', () => {
+  it('keeps only the most recent positions', async () => {
+    for (const id of ['c1', 'c2', 'c3']) {
+      const { media } = createTestPlayer({ plugins: [memoryPlugin({ maxPositions: 2 })], cuid: id, source: 'a.mp4' });
+      await flush();
+      media.setDuration(100);
+      media.timeTo(20);
+    }
+    expect(localStorage.getItem('vp:t:c1')).toBeNull();
+    expect(localStorage.getItem('vp:t:c2')).not.toBeNull();
+    expect(localStorage.getItem('vp:t:c3')).not.toBeNull();
+    expect(JSON.parse(localStorage.getItem('vp:t:index')!)).toEqual(['vp:t:c2', 'vp:t:c3']);
+  });
+
+  it('drops an ended position from the index', async () => {
+    const { media } = createTestPlayer({ plugins: [memoryPlugin()], cuid: 'e1', source: 'a.mp4' });
+    await flush();
+    media.setDuration(100);
+    media.timeTo(20);
+    expect(JSON.parse(localStorage.getItem('vp:t:index')!)).toEqual(['vp:t:e1']);
+    media.end();
+    expect(JSON.parse(localStorage.getItem('vp:t:index')!)).toEqual([]);
+  });
+
+  it('treats a corrupt index as empty', async () => {
+    localStorage.setItem('vp:t:index', '{not json');
+    const { media } = createTestPlayer({ plugins: [memoryPlugin()], cuid: 'k1', source: 'a.mp4' });
+    await flush();
+    media.setDuration(100);
+    media.timeTo(20);
+    expect(JSON.parse(localStorage.getItem('vp:t:index')!)).toEqual(['vp:t:k1']);
+    localStorage.setItem('vp:t:index', '{"a":1}');
+    media.timeTo(30);
+    expect(JSON.parse(localStorage.getItem('vp:t:index')!)).toEqual(['vp:t:k1']);
   });
 });

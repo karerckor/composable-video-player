@@ -6,7 +6,13 @@ describe('parseSource', () => {
     expect(parseSource('https://a.com/v.mp4')).toEqual({
       qualities: [{ label: '', tracks: [{ label: '', urls: ['https://a.com/v.mp4'] }] }],
       subtitles: [],
+      key: 'https://a.com/v.mp4',
     });
+  });
+
+  it('keeps a stable key regardless of the random alternative', () => {
+    expect(parseSource('a.mp4 and b.mp4', { random: () => 0 }).key).toBe('a.mp4 and b.mp4');
+    expect(parseSource('a.mp4 and b.mp4', { random: () => 0 }).key).toBe(parseSource('a.mp4 and b.mp4', { random: () => 0.99 }).key);
   });
 
   it('parses labeled qualities', () => {
@@ -95,5 +101,11 @@ describe('normalizeSpec and sourceKey', () => {
     expect(spec).toEqual({ qualities: [{ label: '', tracks: [{ label: '', urls: ['a.mp4'] }] }], subtitles: [], start: undefined, forceType: 'hls' });
     expect(sourceKey(spec)).toBe('a.mp4');
     expect(sourceKey({ qualities: [], subtitles: [] })).toBe('');
+  });
+
+  it('passes the key through and prefers it in sourceKey', () => {
+    const spec = normalizeSpec({ qualities: [{ label: '', tracks: [{ label: '', urls: ['a.mp4'] }] }], key: 'raw-key' });
+    expect(spec.key).toBe('raw-key');
+    expect(sourceKey(spec)).toBe('raw-key');
   });
 });

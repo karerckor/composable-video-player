@@ -77,7 +77,7 @@ export function parseSource(input: string, opts: ParseOptions = {}): SourceSpec 
     }))
     .filter((q) => q.tracks.length > 0);
 
-  const spec: SourceSpec = { qualities, subtitles };
+  const spec: SourceSpec = { qualities, subtitles, key: input.trim() };
   if (start !== undefined) spec.start = start;
   return spec;
 }
@@ -114,10 +114,11 @@ export function normalizeSpec(input: SourceSpecInput, forceType?: 'hls'): Source
     subtitles: input.subtitles ?? [],
     start: input.start,
     forceType: input.forceType ?? forceType,
+    key: input.key,
   };
 }
 
-/** Stable identity of a source: first url of the first quality/track. */
+/** Stable identity of a source: its `key` when known, else the first url of the first quality/track. */
 export function sourceKey(spec: SourceSpec): string {
-  return spec.qualities[0]?.tracks[0]?.urls[0] ?? '';
+  return spec.key ?? spec.qualities[0]?.tracks[0]?.urls[0] ?? '';
 }

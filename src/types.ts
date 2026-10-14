@@ -81,6 +81,8 @@ export interface SourceSpec {
   subtitles: SubtitleRef[];
   start?: number;
   forceType?: 'hls';
+  /** Stable identity of the source — the raw `file` string when parsed from a string; position memory keys on it. */
+  key?: string;
 }
 
 export type SourceSpecInput = Partial<SourceSpec> & Pick<SourceSpec, 'qualities'>;
