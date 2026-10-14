@@ -42,6 +42,9 @@ const TABLE: Record<string, Mapper> = {
   file: set('source', (v) => (typeof v === 'object' && v !== null ? (v as SourceInput) : str(v))),
   poster: set('poster', str),
   title: set('title', str),
+  // Not PlayerJS options: let compat embeds switch the UI language (default 'ru') and override labels.
+  lang: set('lang', (v) => (v === 'en' || v === 'ru' ? v : undefined)),
+  i18n: set('i18n', (v) => (typeof v === 'object' && v !== null ? (v as Record<string, string>) : undefined)),
   autoplay: set('autoplay', flag),
   loop: set('loop', flag),
   volume: set('volume', num),

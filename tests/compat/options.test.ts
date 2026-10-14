@@ -76,6 +76,14 @@ describe('mapPlayerjsOptions', () => {
     });
   });
 
+  it('passes lang and i18n through, ignoring unsupported languages', () => {
+    const warn = vi.fn();
+    const quiet = { ...log, warn };
+    expect(mapPlayerjsOptions({ id: 'p', lang: 'en', i18n: { settings: 'Options' } }, quiet)).toMatchObject({ lang: 'en', i18n: { settings: 'Options' } });
+    expect(mapPlayerjsOptions({ id: 'p', lang: 'de' }, quiet).lang).toBeUndefined();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it('passes a playlist given as file through unchanged', () => {
     const items = [{ title: 'One', file: 'one.mp4' }];
     expect(mapPlayerjsOptions({ id: 'player', file: items }, log).source).toBe(items);
