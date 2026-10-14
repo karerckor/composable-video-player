@@ -102,7 +102,7 @@ export function isSourceSpecInput(input: unknown): input is SourceSpecInput {
 
 /** A playlist: JSON or a .txt/.json url, an array of items, or an item / `{ playlist }` object. */
 export function isPlaylistInput(input: SourceInput): boolean {
-  if (Array.isArray(input)) return input.every(isRecord);
+  if (Array.isArray(input)) return input.length > 0 && input.every(isRecord);
   if (isRecord(input)) return !isSourceSpecInput(input) && ('file' in input || 'folder' in input || 'playlist' in input);
   if (typeof input !== 'string') return false;
   const s = input.trim();

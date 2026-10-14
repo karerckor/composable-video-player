@@ -96,7 +96,7 @@ describe('isPlaylistInput', () => {
 
   it('detects playlist arrays and playlist-shaped objects', () => {
     expect(isPlaylistInput([{ title: 'a', file: 'x.mp4' }] as never)).toBe(true);
-    expect(isPlaylistInput([] as never)).toBe(true);
+    expect(isPlaylistInput([] as never)).toBe(false);
     expect(isPlaylistInput({ playlist: [] } as never)).toBe(true);
     expect(isPlaylistInput({ file: 'x.mp4' } as never)).toBe(true);
     expect(isPlaylistInput({ folder: [] } as never)).toBe(true);

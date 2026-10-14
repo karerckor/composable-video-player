@@ -138,6 +138,18 @@ describe('playlistPlugin navigation', () => {
     expect(player.state.error?.kind).toBe('unsupported');
   });
 
+  it("an empty array is rejected and doesn't leave api('play') armed", async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { player, media } = await setup();
+    player.api('play', []);
+    await flush();
+    expect(player.state.playlist!.flat).toHaveLength(3);
+    expect(player.state.error?.kind).toBe('unsupported');
+    player.load('other.mp4');
+    await flush();
+    expect(media.play).not.toHaveBeenCalled();
+  });
+
   it('a direct load wins over a playlist that is still loading', async () => {
     const { player, fp } = createTestPlayer({ plugins: [playlistPlugin({ fetch: fetchMock as unknown as typeof fetch })] });
     player.load('https://a.com/pl.json');
