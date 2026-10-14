@@ -73,8 +73,9 @@ export function registerMediaCommands(d: MediaDeps): () => void {
 
     commands.register('setRate', ([r]) => {
       if (!(r > 0)) return;
-      video.defaultPlaybackRate = r;
-      video.playbackRate = r;
+      const rate = clamp(r, 0.0625, 16);
+      video.defaultPlaybackRate = rate;
+      video.playbackRate = rate;
     }),
 
     commands.register('setLoop', ([b]) => {

@@ -86,7 +86,8 @@ export function bindMediaEvents(d: MediaDeps, hooks: MediaEventHooks): () => voi
       suppressPause = false;
       return;
     }
-    if (video.ended || store.get().status === 'error') return;
+    const status = store.get().status;
+    if (video.ended || status === 'error' || status === 'loading') return;
     store.set({ status: 'paused' });
     events.emit('pause');
   });
@@ -101,7 +102,12 @@ export function bindMediaEvents(d: MediaDeps, hooks: MediaEventHooks): () => voi
 
   on('seeked', () => {
     unwait();
-    if (video.currentTime < endAt()) endReached = false;
+    const t = video.currentTime;
+    if (t < endAt()) endReached = false;
+    const duration = video.duration;
+    if (store.get().status === 'ended' && t < Math.min(endAt(), Number.isFinite(duration) ? duration : Infinity)) {
+      store.set({ status: 'paused' });
+    }
     events.emit('seek', video.currentTime);
   });
 
@@ -147,6 +153,7 @@ export function bindMediaEvents(d: MediaDeps, hooks: MediaEventHooks): () => voi
 
   on('ended', () => {
     if (!endReached) finish();
+    else store.set({ status: 'ended' });
   });
 
   on('error', () => hooks.onMediaError(mediaErrorToPlayerError(video.error)));

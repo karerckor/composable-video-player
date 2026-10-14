@@ -35,6 +35,7 @@ export function installFakeMedia(video: HTMLVideoElement): FakeMedia {
   def('ended', () => ended);
   def('currentTime', () => currentTime, (v: number) => {
     currentTime = v;
+    if (v < duration) ended = false;
     fire('seeking');
     fire('seeked');
     fire('timeupdate');

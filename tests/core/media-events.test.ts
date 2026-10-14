@@ -143,4 +143,25 @@ describe('bindMediaEvents', () => {
     deps.video.playbackRate = 1;
     expect(names()).not.toContain('speed');
   });
+
+  it('keeps the ended status when the media ends after the end option already fired', async () => {
+    setup({ end: -10 });
+    media.setDuration(100);
+    await deps.video.play();
+    media.timeTo(91);
+    expect(names().filter((n) => n === 'end')).toHaveLength(1);
+    await deps.video.play();
+    media.end();
+    expect(deps.store.get().status).toBe('ended');
+    expect(names().filter((n) => n === 'end')).toHaveLength(1);
+  });
+
+  it('ignores pause while loading', async () => {
+    await deps.video.play();
+    emitted.length = 0;
+    deps.store.set({ status: 'loading' });
+    deps.video.pause();
+    expect(deps.store.get().status).toBe('loading');
+    expect(names()).not.toContain('pause');
+  });
 });

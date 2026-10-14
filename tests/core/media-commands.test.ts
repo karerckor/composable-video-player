@@ -17,6 +17,7 @@ const USER = { source: 'user' } as const;
 
 beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {});
+  Object.defineProperty(document, 'fullscreenEnabled', { configurable: true, get: () => true });
   const video = document.createElement('video');
   media = installFakeMedia(video);
   const log = createLogger(false);
@@ -112,6 +113,24 @@ describe('media commands', () => {
     expect(emitted).toContain('stop');
   });
 
+  it('setRate clamps to the supported range', () => {
+    d.commands.run('setRate', [100]);
+    expect(d.video.playbackRate).toBe(16);
+    d.commands.run('setRate', [0.001]);
+    expect(d.video.playbackRate).toBe(0.0625);
+  });
+
+  it('scrubbing back after the end resumes from there', async () => {
+    await d.commands.run('play', []);
+    media.end();
+    expect(d.store.get().status).toBe('ended');
+    d.video.currentTime = 40;
+    d.commands.run('toggle', []);
+    await Promise.resolve();
+    expect(d.video.currentTime).toBe(40);
+    expect(d.store.get().status).toBe('playing');
+  });
+
   it('setRate also sets defaultPlaybackRate', () => {
     d.commands.run('setRate', [1.5]);
     expect(d.video.playbackRate).toBe(1.5);
@@ -145,5 +164,16 @@ describe('media commands', () => {
     document.dispatchEvent(new Event('fullscreenchange'));
     expect(d.store.get().fullscreen).toBe(false);
     expect(emitted).toContain('exitfullscreen');
+  });
+
+  it('falls back to the video element when the Fullscreen API is disabled', () => {
+    Object.defineProperty(document, 'fullscreenEnabled', { configurable: true, get: () => false });
+    const request = vi.fn(() => Promise.resolve());
+    (d.root as any).requestFullscreen = request;
+    const enter = vi.fn();
+    (d.video as any).webkitEnterFullscreen = enter;
+    d.commands.run('fullscreen', []);
+    expect(enter).toHaveBeenCalled();
+    expect(request).not.toHaveBeenCalled();
   });
 });

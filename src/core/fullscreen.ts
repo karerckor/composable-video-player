@@ -3,6 +3,7 @@ import type { Logger } from '../types';
 type FsDocument = Document & {
   webkitFullscreenElement?: Element | null;
   webkitExitFullscreen?: () => void;
+  webkitFullscreenEnabled?: boolean;
 };
 type FsElement = HTMLElement & { webkitRequestFullscreen?: () => void };
 type IOSVideo = HTMLVideoElement & {
@@ -18,7 +19,11 @@ export function fullscreenElement(): Element | null {
 /** Must be called from a user gesture, otherwise browsers reject. */
 export function enterFullscreen(root: HTMLElement, video: HTMLVideoElement, log: Logger): void {
   const el = root as FsElement;
-  if (typeof el.requestFullscreen === 'function') {
+  const d = document as FsDocument;
+  const enabled = d.fullscreenEnabled ?? d.webkitFullscreenEnabled;
+  if (!enabled) {
+    (video as IOSVideo).webkitEnterFullscreen?.();
+  } else if (typeof el.requestFullscreen === 'function') {
     Promise.resolve(el.requestFullscreen()).catch((e) => log.warn('fullscreen request rejected', e));
   } else if (typeof el.webkitRequestFullscreen === 'function') {
     el.webkitRequestFullscreen();
