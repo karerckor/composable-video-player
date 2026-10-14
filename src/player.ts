@@ -34,6 +34,8 @@ import { registerBuiltinComponents } from './components';
 
 const API: CommandContext = { source: 'api' };
 let counter = 0;
+/** Live players by container, so reusing a container replaces the previous player. */
+const livePlayers = new WeakMap<HTMLElement, Player>();
 
 function resolveContainer(container: HTMLElement | string): HTMLElement {
   const el = typeof container === 'string' ? document.getElementById(container) : container;
@@ -68,6 +70,11 @@ export function createPlayer(options: PlayerOptions): Player {
   if (!container.id) container.id = `vp${++counter}`;
   const id = container.id;
   const log = createLogger(!!options.log);
+  const previous = livePlayers.get(container);
+  if (previous) {
+    log.warn(`container "${id}" already hosts a player; destroying the previous one`);
+    previous.destroy();
+  }
   injectStyles();
 
   const video = h('video', { playsinline: true, 'webkit-playsinline': true, preload: 'metadata' });
@@ -98,6 +105,7 @@ export function createPlayer(options: PlayerOptions): Player {
   const activity = createUserActivity({ root, store, events, timeout: options.idleTimeout ?? 3000 });
 
   let destroyed = false;
+  let destroying = false;
   const alive = () => {
     if (destroyed) log.warn('player is destroyed');
     return !destroyed;
@@ -158,6 +166,10 @@ export function createPlayer(options: PlayerOptions): Player {
     registerMenu: (menu) => menus.register(menu),
     registerHideRule: (name, rule) => hideRules.register(name, rule),
     addLayer(node, position) {
+      if (destroyed) {
+        log.warn('player is destroyed');
+        return () => {};
+      }
       const mounted = engine.build(node, position === 'below-ui' ? layerBelow : layerAbove);
       if (!mounted) return () => {};
       layers.add(mounted);
@@ -206,14 +218,17 @@ export function createPlayer(options: PlayerOptions): Player {
   if (options.ratio === 'auto') video.addEventListener('loadedmetadata', onMetadata);
 
   // 8–9. Init, then load
+  livePlayers.set(container, player);
   events.emit('init');
   if (options.source !== undefined) player.load(options.source);
   return player;
 
   function destroy(): void {
-    if (destroyed) return;
+    if (destroying || destroyed) return;
+    destroying = true;
     events.emit('destroy');
     destroyed = true;
+    if (livePlayers.get(container) === player) livePlayers.delete(container);
     layout?.dispose();
     for (const mounted of [...layers].reverse()) mounted.dispose();
     layers.clear();

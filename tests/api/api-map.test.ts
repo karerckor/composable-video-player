@@ -133,6 +133,14 @@ describe('createApi commands', () => {
     expect(calls.map(([n]) => n)).toEqual(['load', 'load', 'load']);
   });
 
+  it('play with a non-string argument loads it unchanged', () => {
+    register('load', 'play', 'playItem');
+    const list = [{ title: 'a', file: 'a.mp4' }];
+    api('play', list);
+    expect(calls).toEqual([['load', [list], 'api']]);
+    expect(calls[0]![1][0]).toBe(list);
+  });
+
   it('play with id: and find use playItem', () => {
     register('playItem');
     api('play', 'id:s2');

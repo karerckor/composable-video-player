@@ -144,4 +144,62 @@ describe('createPlayer', () => {
     expect(console.warn).toHaveBeenCalled();
     player = null;
   });
+
+  it('survives a reentrant destroy from a destroy listener', () => {
+    player = createPlayer({ container: host });
+    const p = player;
+    const listener = vi.fn(() => {
+      p.destroy();
+      p.api('destroy');
+    });
+    p.on('destroy', listener);
+    expect(() => p.destroy()).not.toThrow();
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(host.childElementCount).toBe(0);
+    player = null;
+  });
+
+  it('replaces a live player when the container is reused', () => {
+    const first = createPlayer({ container: host });
+    const onDestroy = vi.fn();
+    first.on('destroy', onDestroy);
+    player = createPlayer({ container: host });
+    expect(onDestroy).toHaveBeenCalledTimes(1);
+    expect(host.querySelectorAll('.vp-root')).toHaveLength(1);
+    expect(host.querySelector('.vp-root')).toBe(player.root);
+    expect(console.warn).toHaveBeenCalled();
+    first.destroy(); // stale destroy must not disturb the new player
+    expect(host.querySelectorAll('.vp-root')).toHaveLength(1);
+    const again = createPlayer({ container: host });
+    player = again;
+    expect(host.querySelectorAll('.vp-root')).toHaveLength(1);
+  });
+
+  it('allows a fresh player after destroy without warning', () => {
+    const first = createPlayer({ container: host });
+    first.destroy();
+    vi.mocked(console.warn).mockClear();
+    player = createPlayer({ container: host });
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  it('addLayer after destroy warns and is a no-op', () => {
+    let add!: (node: any, pos: 'below-ui' | 'above-ui') => () => void;
+    const plugin: Plugin = {
+      name: 'late',
+      setup(ctx) {
+        ctx.registerComponent('badge', () => ({ el: h('span', { class: 'badge' }, 'B') }));
+        add = ctx.addLayer;
+      },
+    };
+    player = createPlayer({ container: host, plugins: [plugin] });
+    const root = player.root;
+    player.destroy();
+    vi.mocked(console.warn).mockClear();
+    const off = add({ type: 'badge' }, 'above-ui');
+    expect(root.querySelector('.badge')).toBeNull();
+    expect(console.warn).toHaveBeenCalled();
+    expect(() => off()).not.toThrow();
+    player = null;
+  });
 });

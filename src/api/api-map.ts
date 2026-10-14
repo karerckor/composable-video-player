@@ -65,9 +65,8 @@ export function createApi(ctx: ApiContext): (cmd: string, arg?: unknown) => unkn
   const table: Record<string, (arg: unknown) => unknown> = {
     play: (arg) => {
       if (arg === NONE) return run('play');
-      const value = String(arg);
-      if (value.startsWith('id:')) return run('playItem', value.slice(3), true);
-      loadThenPlay(() => run('load', value));
+      if (typeof arg === 'string' && arg.startsWith('id:')) return run('playItem', arg.slice(3), true);
+      loadThenPlay(() => run('load', arg));
       return undefined;
     },
     pause: () => run('pause'),
