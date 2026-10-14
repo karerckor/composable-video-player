@@ -1,3 +1,4 @@
+import { createWheelStepper } from '../ui/wheel';
 import type { CommandArgs, CommandContext, CommandName, Plugin } from '../types';
 
 export interface HotkeysOptions {
@@ -18,6 +19,7 @@ declare module '../types' {
 
 const USER: CommandContext = { source: 'user' };
 const DEFAULTS: Required<HotkeysOptions> = { seekStep: 5, volumeStep: 0.1, enter: false, numbers: true, wheel: true, global: false };
+const NO_WHEEL = '[role="menu"], .vp-playlist, .vp-slider, .vp-timeline';
 const TEXT_INPUT = 'input, textarea, select, [contenteditable=""], [contenteditable="true"]';
 
 export function hotkeysPlugin(o?: HotkeysOptions | false): Plugin {
@@ -32,6 +34,8 @@ export function hotkeysPlugin(o?: HotkeysOptions | false): Plugin {
         const result = ctx.commands.run(name, args, USER);
         if (result instanceof Promise) result.catch((e) => ctx.log.warn(`hotkey "${name}" rejected`, e));
       };
+
+      const stepWheel = createWheelStepper();
 
       const actionFor = (e: KeyboardEvent): (() => void) | null => {
         const code = e.code || e.key;
@@ -66,6 +70,7 @@ export function hotkeysPlugin(o?: HotkeysOptions | false): Plugin {
 
       const onKey = (e: KeyboardEvent) => {
         if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.repeat && !(e.code || e.key).startsWith('Arrow')) return;
         const target = e.target as Element | null;
         if (target?.closest?.(TEXT_INPUT) || target?.closest?.('[role="menu"]')) return;
         const code = e.code || e.key;
@@ -82,9 +87,13 @@ export function hotkeysPlugin(o?: HotkeysOptions | false): Plugin {
       };
 
       const onWheel = (e: WheelEvent) => {
-        if (!cfg.wheel || !ctx.store.get().fullscreen) return;
+        const state = ctx.store.get();
+        if (!cfg.wheel || !state.fullscreen || e.defaultPrevented || e.deltaY === 0) return;
+        if ((e.target as Element | null)?.closest?.(NO_WHEEL)) return;
         e.preventDefault();
-        user('setVolume', e.deltaY < 0 ? `+${cfg.volumeStep}` : `-${cfg.volumeStep}`);
+        const step = stepWheel(e);
+        if (step === 1) user('setVolume', `+${cfg.volumeStep}`);
+        else if (step === -1 && !state.muted) user('setVolume', `-${cfg.volumeStep}`);
       };
 
       const onEnter = () => (hovered = true);

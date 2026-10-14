@@ -32,9 +32,9 @@ export function speedPlugin(o: SpeedPluginOptions = {}): Plugin {
       ctx.store.set({ speeds });
 
       const offs = [
-        ctx.commands.register('setSpeedIndex', ([index]) => {
+        ctx.commands.register('setSpeedIndex', ([index], c) => {
           const rate = speeds[index];
-          if (rate) ctx.commands.run('setRate', [rate]);
+          if (rate) ctx.commands.run('setRate', [rate], c);
         }),
         ctx.registerMenu({
           id: 'speed',

@@ -116,16 +116,74 @@ describe('hotkeysPlugin', () => {
     expect(calls).toHaveLength(1);
   });
 
+  const wheel = (deltaY: number, target: EventTarget = player.root, init: WheelEventInit = {}) => {
+    const e = new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true, ...init });
+    target.dispatchEvent(e);
+    return e;
+  };
+
   it('changes volume with the wheel only in fullscreen', () => {
-    player.root.dispatchEvent(new WheelEvent('wheel', { deltaY: -1, cancelable: true }));
+    wheel(-60);
     expect(calls).toEqual([]);
     store.set({ fullscreen: true });
-    player.root.dispatchEvent(new WheelEvent('wheel', { deltaY: -1, cancelable: true }));
-    player.root.dispatchEvent(new WheelEvent('wheel', { deltaY: 1, cancelable: true }));
+    expect(wheel(-60).defaultPrevented).toBe(true);
+    wheel(60);
     expect(calls).toEqual([
       ['setVolume', ['+0.1'], 'user'],
       ['setVolume', ['-0.1'], 'user'],
     ]);
+  });
+
+  it('ignores wheel events with deltaY 0 and accumulates small deltas', () => {
+    store.set({ fullscreen: true });
+    expect(wheel(0).defaultPrevented).toBe(false);
+    expect(calls).toEqual([]);
+    for (let i = 0; i < 5; i++) wheel(-10);
+    expect(calls).toEqual([['setVolume', ['+0.1'], 'user']]);
+  });
+
+  it('does not lower the volume with the wheel while muted', () => {
+    store.set({ fullscreen: true, muted: true });
+    wheel(60);
+    expect(calls).toEqual([]);
+  });
+
+  it('ignores wheel events that are already handled', () => {
+    store.set({ fullscreen: true });
+    player.root.addEventListener('wheel', (e) => e.preventDefault(), { once: true, capture: true });
+    wheel(-60);
+    expect(calls).toEqual([]);
+  });
+
+  it('ignores the wheel inside the settings menu', () => {
+    setup(undefined, [speedPlugin(), qualityPlugin()]);
+    store.set({ fullscreen: true });
+    player.root.querySelector<HTMLButtonElement>('.vp-settings')!.click();
+    const item = player.root.querySelector<HTMLElement>('.vp-menu .vp-menu-item')!;
+    expect(wheel(-60, item).defaultPrevented).toBe(false);
+    expect(calls).toEqual([]);
+  });
+
+  it('ignores the wheel over sliders and the playlist', () => {
+    store.set({ fullscreen: true });
+    for (const cls of ['vp-slider', 'vp-timeline', 'vp-playlist']) {
+      const el = document.createElement('div');
+      el.className = cls;
+      player.root.append(el);
+      wheel(-60, el);
+    }
+    expect(calls).toEqual([]);
+  });
+
+  it('ignores key repeat except for arrows', () => {
+    store.set({ duration: 100 });
+    key('Space', { repeat: true });
+    key('KeyF', { repeat: true });
+    key('KeyM', { repeat: true });
+    key('Digit5', { repeat: true });
+    expect(calls).toEqual([]);
+    key('ArrowRight', { repeat: true });
+    expect(calls).toEqual([['seek', ['+5'], 'user']]);
   });
 
   it('can be disabled', () => {

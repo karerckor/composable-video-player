@@ -3,6 +3,7 @@ import { speedPlugin } from '../../src/plugins/speed';
 import { audioTracksPlugin } from '../../src/plugins/audiotracks';
 import { createTestPlayer } from '../helpers/player-harness';
 import { flush } from '../helpers/flush';
+import type { Plugin } from '../../src/types';
 
 const menuLabels = (host: HTMLElement) => [...host.querySelectorAll('.vp-menu-item .vp-menu-label')].map((e) => e.textContent);
 
@@ -16,6 +17,17 @@ describe('speedPlugin', () => {
     expect(player.state.rate).toBe(2);
     player.api('speed', 0);
     expect(player.state.rate).toBe(0.5);
+  });
+
+  it('passes the command context through to setRate', () => {
+    const sources: string[] = [];
+    const spy: Plugin = {
+      name: 'spy',
+      setup: (ctx) => void ctx.commands.before('setRate', ((_a: unknown[], c: { source: string }) => void sources.push(c.source)) as never),
+    };
+    const { player } = createTestPlayer({ plugins: [spy, speedPlugin()] });
+    player.api('speed', 1);
+    expect(sources).toEqual(['api']);
   });
 
   it('applies defaultSpeed on init', () => {

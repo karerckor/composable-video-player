@@ -49,8 +49,10 @@ export function autoplayPlugin(o: AutoplayPluginOptions = {}): Plugin {
           mutedByAutoplay = false;
         }),
         ctx.commands.before('toggle', (_args, c) => {
-          if (!mutedByAutoplay || c.source !== 'user' || ctx.store.get().status !== 'playing') return;
+          if (!mutedByAutoplay || c.source !== 'user') return;
           mutedByAutoplay = false;
+          const status = ctx.store.get().status;
+          if (status !== 'playing' && status !== 'loading') return; // e.g. paused: a plain toggle
           ctx.commands.run('unmute', []);
           return false;
         }),
