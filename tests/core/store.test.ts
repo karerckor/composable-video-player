@@ -60,6 +60,39 @@ describe('createStore', () => {
     expect(err).toHaveBeenCalled();
   });
 
+  it('isolates throwing selectors: the set lands, other subscribers run, the failed one keeps its last value', () => {
+    const log = createLogger(false);
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const store = createStore(initial(), log);
+    const bad = vi.fn();
+    const good = vi.fn();
+    store.select((s) => { if (s.a === 9) throw new Error('boom'); return s.a; }, bad);
+    store.select((s) => s.a, good);
+    expect(() => store.set({ a: 9 })).not.toThrow();
+    expect(store.get().a).toBe(9);
+    expect(good).toHaveBeenCalledWith(9, 1);
+    expect(bad).not.toHaveBeenCalled();
+    expect(err).toHaveBeenCalledWith('[vp]', 'store selector failed', expect.any(Error));
+    // `last` stayed at 1, so the next successful evaluation reports the change from 1.
+    store.set({ a: 10 });
+    expect(bad).toHaveBeenCalledWith(10, 1);
+  });
+
+  it('a selector throwing on subscribe is logged, starts from undefined and skips the immediate call', () => {
+    const log = createLogger(false);
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const store = createStore(initial(), log);
+    const cb = vi.fn();
+    expect(() =>
+      store.select((s) => { if (s.a === 1) throw new Error('boom'); return s.a; }, cb, { immediate: true }),
+    ).not.toThrow();
+    expect(err).toHaveBeenCalledWith('[vp]', 'store selector failed', expect.any(Error));
+    // No value could be computed, so there is nothing to report immediately.
+    expect(cb).not.toHaveBeenCalled();
+    store.set({ a: 2 });
+    expect(cb).toHaveBeenCalledWith(2, undefined);
+  });
+
   it('handles nested set inside a subscriber', () => {
     const store = createStore(initial());
     const seen: number[] = [];

@@ -103,6 +103,36 @@ describe('createPlayer', () => {
     expect(dispose).toHaveBeenCalled();
   });
 
+  it('a plugin menu whose visible() throws does not break load', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const events: EventName[] = [];
+    const plugin: Plugin = {
+      name: 'bad-menu',
+      setup(ctx) {
+        ctx.events.onAny((n) => events.push(n));
+        ctx.registerMenu({
+          id: 'bad',
+          label: 'Bad',
+          visible: (s) => {
+            if (s.status === 'loading') throw new Error('boom');
+            return false;
+          },
+          options: () => [],
+          current: () => null,
+          select: () => {},
+        });
+      },
+    };
+    player = createPlayer({ container: host, plugins: [fakeProviderPlugin(), plugin] });
+    installFakeMedia(player.video);
+    player.load('c.mp4');
+    await flush();
+    expect(events).toContain('new');
+    expect(player.state.status).not.toBe('loading');
+    expect(err).not.toHaveBeenCalledWith('[vp]', expect.stringContaining('command "load" failed'), expect.anything());
+    expect(err).toHaveBeenCalledWith('[vp]', 'store selector failed', expect.any(Error));
+  });
+
   it('rebuilds the layout with the layout command and supports layout:false', () => {
     player = createPlayer({ container: host });
     player.command('layout', { type: 'root', children: [{ type: 'play' }] });
