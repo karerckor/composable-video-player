@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Playerjs } from '../../src/compat/playerjs';
 import { installFakeMedia } from '../helpers/fake-media';
+import { flush } from '../helpers/flush';
 
 let instance: Playerjs | null;
 
@@ -85,6 +86,29 @@ describe('Playerjs', () => {
     expect(calls).toContain('new');
     expect(calls.indexOf('new')).toBe(1);
     expect(dom.slice(0, 2)).toEqual(['init', 'new']);
+  });
+
+  it('starts a playlist given as a file array', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    instance = new Playerjs({ id: 'player', file: [{ title: 'One', file: 'one.mp4' }, { title: 'Two', file: 'two.mp4' }] });
+    installFakeMedia(instance.player.video);
+    await flush();
+    expect(instance.player.state.playlist?.flat).toHaveLength(2);
+    expect(instance.player.state.playlist?.index).toBe(0);
+    expect(instance.player.state.url).toBe('one.mp4');
+    expect(instance.player.state.title).toBe('One');
+    expect(instance.player.state.error).toBeNull();
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("api('file', array) loads a playlist", async () => {
+    instance = new Playerjs({ id: 'player', file: 'a.mp4' });
+    installFakeMedia(instance.player.video);
+    await flush();
+    instance.api('file', [{ title: 'Two', file: 'two.mp4' }]);
+    await flush();
+    expect(instance.player.state.playlist?.flat).toHaveLength(1);
+    expect(instance.player.state.url).toBe('two.mp4');
   });
 
   it('does not let a throwing ready callback escape', async () => {

@@ -1,8 +1,10 @@
-import type { Logger, PlayerOptions, ThemeVars } from '../types';
+import type { Logger, PlayerOptions, SourceInput, ThemeVars } from '../types';
+import type { PlaylistItem } from '../plugins/playlist';
 
 export interface PlayerjsOptions {
   id: string;
-  file?: string;
+  /** A source string, or a playlist (array of items / `{ playlist }` object). */
+  file?: string | PlaylistItem[] | { playlist: PlaylistItem[] };
   poster?: string;
   title?: string;
   nocontrols?: 0 | 1 | boolean;
@@ -36,7 +38,8 @@ const color =
 /** The only place that knows PlayerJS option names. */
 const TABLE: Record<string, Mapper> = {
   id: set('container', str),
-  file: set('source', str),
+  // Playlist arrays/objects pass through for the playlist plugin's load hook.
+  file: set('source', (v) => (typeof v === 'object' && v !== null ? (v as SourceInput) : str(v))),
   poster: set('poster', str),
   title: set('title', str),
   autoplay: set('autoplay', flag),

@@ -119,6 +119,25 @@ describe('playlistPlugin navigation', () => {
     expect(media.play).toHaveBeenCalledTimes(1);
   });
 
+  it('loads a playlist given as an array or a { playlist } object', async () => {
+    const { player, fp } = createTestPlayer({ plugins: [playlistPlugin({ fetch: fetchMock as unknown as typeof fetch })] });
+    player.load(ITEMS as never);
+    await flush();
+    expect(fp.loads.map((l) => l.url)).toEqual(['one.mp4']);
+    player.api('file', { playlist: [{ file: 'x.mp4' }] });
+    await flush();
+    expect(fp.loads.map((l) => l.url)).toEqual(['one.mp4', 'x.mp4']);
+    expect(player.state.playlist!.flat).toHaveLength(1);
+  });
+
+  it('invalid load input does not drop the playlist', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { player } = await setup();
+    player.load(null as never);
+    expect(player.state.playlist).toBeDefined();
+    expect(player.state.error?.kind).toBe('unsupported');
+  });
+
   it('a direct load wins over a playlist that is still loading', async () => {
     const { player, fp } = createTestPlayer({ plugins: [playlistPlugin({ fetch: fetchMock as unknown as typeof fetch })] });
     player.load('https://a.com/pl.json');

@@ -76,6 +76,13 @@ describe('mapPlayerjsOptions', () => {
     });
   });
 
+  it('passes a playlist given as file through unchanged', () => {
+    const items = [{ title: 'One', file: 'one.mp4' }];
+    expect(mapPlayerjsOptions({ id: 'player', file: items }, log).source).toBe(items);
+    const wrapped = { playlist: items };
+    expect(mapPlayerjsOptions({ id: 'player', file: wrapped as never }, log).source).toBe(wrapped);
+  });
+
   it('parses hlsconfig given as a JSON string', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     expect(mapPlayerjsOptions({ id: 'p', hlsconfig: '{"maxBufferLength":3}' }, log).hlsConfig).toEqual({ maxBufferLength: 3 });

@@ -1,5 +1,5 @@
 import type { Plugin, SourceSpecInput } from '../../types';
-import { isPlaylistInput, parseSource, parseSubtitleList } from '../../source/parse';
+import { isPlaylistInput, isSourceSpecInput, parseSource, parseSubtitleList } from '../../source/parse';
 import { createIconButton } from '../../ui/button';
 import { findIndex, flattenPlaylist, loadPlaylistInput, normalizePlaylist, type PlaylistItem, type PlaylistState } from './model';
 import { playlistPanelComponent } from './panel';
@@ -193,14 +193,15 @@ export function playlistPlugin(o: PlaylistPluginOptions = {}): Plugin {
 
         ctx.commands.before('load', ([input]) => {
           if (!isPlaylistInput(input)) {
-            if (internal || input === lastItemInput) return;
+            // Invalid input is rejected by the media controller and must not drop the playlist.
+            if (internal || input === lastItemInput || (typeof input !== 'string' && !isSourceSpecInput(input))) return;
             // A direct load supersedes a playlist that is still loading, and makes the current one stale.
             request++;
             epoch++;
             if (current()) ctx.store.set({ playlist: undefined });
             return;
           }
-          open(input as string);
+          open(input as string | PlaylistItem[]); // normalizePlaylist also unwraps item / `{ playlist }` objects
           return false;
         }),
 

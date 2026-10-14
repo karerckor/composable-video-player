@@ -93,6 +93,18 @@ describe('isPlaylistInput', () => {
     expect(isPlaylistInput('[{broken')).toBe(false);
     expect(isPlaylistInput({ qualities: [] })).toBe(false);
   });
+
+  it('detects playlist arrays and playlist-shaped objects', () => {
+    expect(isPlaylistInput([{ title: 'a', file: 'x.mp4' }] as never)).toBe(true);
+    expect(isPlaylistInput([] as never)).toBe(true);
+    expect(isPlaylistInput({ playlist: [] } as never)).toBe(true);
+    expect(isPlaylistInput({ file: 'x.mp4' } as never)).toBe(true);
+    expect(isPlaylistInput({ folder: [] } as never)).toBe(true);
+    expect(isPlaylistInput(['x.mp4'] as never)).toBe(false);
+    expect(isPlaylistInput({} as never)).toBe(false);
+    expect(isPlaylistInput(null as never)).toBe(false);
+    expect(isPlaylistInput(123 as never)).toBe(false);
+  });
 });
 
 describe('normalizeSpec and sourceKey', () => {

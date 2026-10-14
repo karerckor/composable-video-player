@@ -133,6 +133,27 @@ describe('MediaController load', () => {
     expect(names()).toContain('loaderror');
   });
 
+  it('rejects a playlist array without the playlist plugin', () => {
+    setup();
+    expect(() => d.commands.run('load', [[{ title: 'a', file: 'a.mp4' }] as never])).not.toThrow();
+    expect(d.store.get()).toMatchObject({ status: 'error', error: { kind: 'unsupported', message: 'Playlist input requires the playlist plugin' } });
+  });
+
+  it.each([null, 123, {}, { qualities: 'a.mp4' }])('rejects invalid input %j without forgetting the last good one', async (bad) => {
+    const { providers: [p] } = setup();
+    d.commands.run('load', ['a.mp4']);
+    await flush();
+    const errors: unknown[] = [];
+    d.events.on('loaderror', (e) => errors.push(e));
+    expect(() => d.commands.run('load', [bad as never])).not.toThrow();
+    expect(d.store.get()).toMatchObject({ status: 'error', error: { kind: 'unsupported' } });
+    expect(errors).toHaveLength(1);
+    d.commands.run('reload', []);
+    await flush();
+    expect(p!.loads.map((l) => l.url)).toEqual(['a.mp4', 'a.mp4']);
+    expect(d.store.get().status).toBe('ready');
+  });
+
   it('ignores a stale load that resolves after a newer one', async () => {
     let resolveFirst!: () => void;
     const p = fakeProvider({ load: (url) => (url === 'first.mp4' ? new Promise<void>((r) => (resolveFirst = r)) : Promise.resolve()) });

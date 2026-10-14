@@ -93,7 +93,17 @@ export function parseSubtitleList(value: string): SubtitleRef[] {
     });
 }
 
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** A source spec object: the only non-string input the media controller can load itself. */
+export function isSourceSpecInput(input: unknown): input is SourceSpecInput {
+  return isRecord(input) && Array.isArray(input.qualities);
+}
+
+/** A playlist: JSON or a .txt/.json url, an array of items, or an item / `{ playlist }` object. */
 export function isPlaylistInput(input: SourceInput): boolean {
+  if (Array.isArray(input)) return input.every(isRecord);
+  if (isRecord(input)) return !isSourceSpecInput(input) && ('file' in input || 'folder' in input || 'playlist' in input);
   if (typeof input !== 'string') return false;
   const s = input.trim();
   if (s.startsWith('[{') || s.startsWith('{')) {

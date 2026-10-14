@@ -1,6 +1,6 @@
 import type { MediaProvider, PlayerError, ProviderContext, Selection, SourceInput, SourceSpec } from '../types';
 import type { MediaDeps } from './media-deps';
-import { isPlaylistInput, normalizeSpec, parseSource } from '../source/parse';
+import { isPlaylistInput, isSourceSpecInput, normalizeSpec, parseSource } from '../source/parse';
 import { toPlayerError } from '../shared/errors';
 import { clamp } from '../shared/clamp';
 import { bindMediaEvents } from './media-events';
@@ -178,9 +178,13 @@ export function createMediaController(d: MediaDeps): MediaController {
     registerMediaCommands(d),
 
     commands.register('load', ([input]) => {
-      lastInput = input;
+      // Rejected input must not replace `lastInput`: reload keeps replaying the last good source.
       if (isPlaylistInput(input)) {
         rejectInput(input, 'Playlist input requires the playlist plugin');
+        return;
+      }
+      if (typeof input !== 'string' && !isSourceSpecInput(input)) {
+        rejectInput(input, 'Invalid source: expected a string or an object with a qualities array');
         return;
       }
       const parsed =
@@ -191,6 +195,7 @@ export function createMediaController(d: MediaDeps): MediaController {
         rejectInput(input, 'Source is empty');
         return;
       }
+      lastInput = input;
 
       let sel: Selection = { quality: parsed.qualities.length - 1, audio: 0, start: parsed.start ?? options.start ?? 0 };
       for (const transform of [...d.transforms]) {
