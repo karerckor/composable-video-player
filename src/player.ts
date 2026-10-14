@@ -31,6 +31,7 @@ import { createLayoutEngine, type Mounted } from './ui/layout';
 import { controlsVisible, createUserActivity } from './ui/activity';
 import { defaultLayout } from './ui/default-layout';
 import { registerBuiltinComponents } from './components';
+import { defaultPlugins } from './plugins';
 
 const API: CommandContext = { source: 'api' };
 let counter = 0;
@@ -189,7 +190,7 @@ export function createPlayer(options: PlayerOptions): Player {
 
   // 6. Plugins
   const pluginHost = createPluginHost(log);
-  pluginHost.setupAll(options.plugins ?? [], pluginContext);
+  pluginHost.setupAll(options.plugins ?? defaultPlugins(), pluginContext);
 
   // 7. Layout
   let layout: Mounted | null = null;

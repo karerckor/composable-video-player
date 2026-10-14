@@ -11,3 +11,4 @@ export { createSlider } from './ui/slider';
 export { defaultIcons } from './ui/icons';
 export { dictionaries } from './ui/i18n';
 export { formatTime } from './shared/time';
+export * from './plugins';
