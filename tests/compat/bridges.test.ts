@@ -44,6 +44,22 @@ describe('bridgeEvents', () => {
     expect(global).toHaveBeenCalledTimes(2);
   });
 
+  it('buffers other events behind a pending init and flushes them in order', async () => {
+    const bus = createEventBus();
+    const container = document.createElement('div');
+    const calls: Array<[string, unknown]> = [];
+    (window as unknown as { PlayerjsEvents: unknown }).PlayerjsEvents = (e: string, _id: string, d: unknown) => calls.push([e, d]);
+    bridgeEvents(bus, container, 'player');
+    bus.emit('init');
+    bus.emit('time', 1);
+    bus.emit('play');
+    expect(calls).toEqual([]);
+    await Promise.resolve();
+    expect(calls).toEqual([['init', undefined], ['time', 1], ['play', undefined]]);
+    bus.emit('pause');
+    expect(calls[3]).toEqual(['pause', undefined]);
+  });
+
   it('drops a pending init when the bridge is removed first', async () => {
     const bus = createEventBus();
     const global = vi.fn();

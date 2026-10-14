@@ -39,8 +39,13 @@ export class Playerjs {
               queueMicrotask(() => {
                 if (!active) return;
                 const fn = (window as unknown as Record<string, unknown>)[name];
-                if (typeof fn === 'function') fn(ctx.player.id);
-                else ctx.log.warn(`Playerjs: ready function "${name}" not found`);
+                if (typeof fn === 'function') {
+                  try {
+                    fn(ctx.player.id);
+                  } catch (e) {
+                    console.error('[vp] ready callback failed', e);
+                  }
+                } else ctx.log.warn(`Playerjs: ready function "${name}" not found`);
               });
             }),
           );

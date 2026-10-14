@@ -72,6 +72,32 @@ describe('Playerjs', () => {
     expect(seenByInit).toBe(instance);
   });
 
+  it('keeps event order after the deferred init', async () => {
+    const calls: string[] = [];
+    (window as unknown as { PlayerjsEvents: unknown }).PlayerjsEvents = (e: string) => calls.push(e);
+    const dom: string[] = [];
+    const host = document.getElementById('player')!;
+    for (const name of ['init', 'new']) host.addEventListener(name, () => dom.push(name));
+    instance = new Playerjs({ id: 'player', file: 'a.mp4' });
+    expect(calls).toEqual([]);
+    await Promise.resolve();
+    expect(calls.indexOf('init')).toBe(0);
+    expect(calls).toContain('new');
+    expect(calls.indexOf('new')).toBe(1);
+    expect(dom.slice(0, 2)).toEqual(['init', 'new']);
+  });
+
+  it('does not let a throwing ready callback escape', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    (window as unknown as { onPlayerReady: unknown }).onPlayerReady = () => {
+      throw new Error('boom');
+    };
+    instance = new Playerjs({ id: 'player', ready: 'onPlayerReady' });
+    await Promise.resolve();
+    expect(error).toHaveBeenCalledWith('[vp] ready callback failed', expect.any(Error));
+    error.mockRestore();
+  });
+
   it('warns once when postmessage is enabled without postmessageOrigin', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     instance = new Playerjs({ id: 'player', postmessage: 1 });

@@ -20,11 +20,17 @@ export function bridgeEvents(events: EventBus, container: HTMLElement, id: strin
     }
     container.dispatchEvent(new CustomEvent(name, { detail: data }));
   };
+  let pending: Array<[EventName, unknown]> | null = null;
   const offAny = events.onAny((name, data) => {
     if (!PUBLIC.has(name)) return;
-    if (name === 'init') {
+    if (pending) {
+      pending.push([name, data]);
+    } else if (name === 'init') {
+      const buffer: Array<[EventName, unknown]> = (pending = [[name, data]]);
       queueMicrotask(() => {
-        if (active) deliver(name, data);
+        if (!active) return;
+        pending = null;
+        for (const [n, d] of buffer) deliver(n, d);
       });
     } else {
       deliver(name, data);
@@ -32,6 +38,7 @@ export function bridgeEvents(events: EventBus, container: HTMLElement, id: strin
   });
   return () => {
     active = false;
+    pending = null;
     offAny();
   };
 }
