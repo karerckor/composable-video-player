@@ -21,6 +21,7 @@ export function createMediaController(d: MediaDeps): MediaController {
   let providerQualities = false;
   let providerAudio = false;
   let token = 0;
+  let attempt = 0;
   let chain: string[] = [];
   let chainIndex = 0;
   let retriesUsed = 0;
@@ -58,7 +59,7 @@ export function createMediaController(d: MediaDeps): MediaController {
       store.set({ audioTracks: list, audioTrack: clamp(current, 0, Math.max(0, list.length - 1)) });
     },
     error(err) {
-      if (provider === owner) fail(token, store.get().url, err, video.currentTime, !video.paused);
+      if (provider === owner) fail(token, attempt, store.get().url, err, video.currentTime, !video.paused);
     },
     log,
     options,
@@ -82,8 +83,9 @@ export function createMediaController(d: MediaDeps): MediaController {
     events.emit('error', error);
   };
 
-  const fail = (t: number, url: string, error: PlayerError, time: number, resume: boolean) => {
-    if (t !== token) return;
+  const fail = (t: number, a: number, url: string, error: PlayerError, time: number, resume: boolean) => {
+    if (t !== token || a !== attempt) return;
+    attempt++;
     pending = false;
     events.emit('loaderror', { url, error });
     if (chainIndex < chain.length - 1) {
@@ -94,6 +96,7 @@ export function createMediaController(d: MediaDeps): MediaController {
     const { retries, delay } = reloadOptions();
     if (retriesUsed < retries) {
       retriesUsed++;
+      clearTimeout(retryTimer);
       retryTimer = setTimeout(() => {
         if (t === token) tryUrl(t, time, resume);
       }, delay);
@@ -106,7 +109,7 @@ export function createMediaController(d: MediaDeps): MediaController {
     const url = chain[chainIndex]!;
     const next = spec ? pickProvider(url, spec) : null;
     if (!next) {
-      fail(t, url, { kind: 'unsupported', message: `No provider can play ${url}` }, time, resume);
+      fail(t, attempt, url, { kind: 'unsupported', message: `No provider can play ${url}` }, time, resume);
       return;
     }
     if (next !== provider) {
@@ -118,6 +121,7 @@ export function createMediaController(d: MediaDeps): MediaController {
     }
     store.set({ url });
     pending = true;
+    const a = ++attempt;
     let loading: Promise<void>;
     try {
       loading = next.load(url, time);
@@ -126,13 +130,14 @@ export function createMediaController(d: MediaDeps): MediaController {
     }
     loading.then(
       () => {
-        if (t !== token) return;
+        if (t !== token || a !== attempt) return;
         pending = false;
+        retriesUsed = 0;
         if (store.get().status === 'loading') store.set({ status: 'ready' });
         events.emit('metadata', { duration: video.duration });
         if (resume) playSafe();
       },
-      (err) => fail(t, url, toPlayerError(err), time, resume),
+      (err) => fail(t, a, url, toPlayerError(err), time, resume),
     );
   };
 
@@ -149,7 +154,11 @@ export function createMediaController(d: MediaDeps): MediaController {
     tryUrl(token, time, resume);
   };
 
-  const switchSource = () => startChain(video.currentTime, !video.paused);
+  const switchSource = () => {
+    const time = pending ? selection.start : video.currentTime;
+    store.set({ status: 'loading', error: null });
+    startChain(time, !video.paused);
+  };
 
   const rejectInput = (input: SourceInput, message: string) => {
     token++;
@@ -163,7 +172,7 @@ export function createMediaController(d: MediaDeps): MediaController {
     bindMediaEvents(d, {
       onMediaError(err) {
         if (pending || !chain.length || store.get().status === 'error') return;
-        fail(token, store.get().url, err, video.currentTime, !video.paused);
+        fail(token, attempt, store.get().url, err, video.currentTime, !video.paused);
       },
     }),
     registerMediaCommands(d),

@@ -165,6 +165,61 @@ describe('MediaController load', () => {
   });
 });
 
+describe('MediaController attempts and retries', () => {
+  it('ignores a duplicate failure report for the same attempt', async () => {
+    const fp: ReturnType<typeof fakeProvider> = fakeProvider({
+      load: async (url) => {
+        if (url === 'a.mp4') {
+          const error = { kind: 'network' as const, message: 'x' };
+          fp.ctx.error(error);
+          throw error;
+        }
+      },
+    });
+    setup({}, [fp]);
+    d.commands.run('load', ['a.mp4 or b.mp4 or c.mp4']);
+    await flush();
+    expect(fp.loads.map((l) => l.url)).toEqual(['a.mp4', 'b.mp4']);
+  });
+
+  it('ignores a superseded attempt that resolves late', async () => {
+    let resolveA!: () => void;
+    const fp: ReturnType<typeof fakeProvider> = fakeProvider({
+      load: (url) =>
+        new Promise<void>((resolve) => {
+          if (url === 'a.mp4') {
+            resolveA = resolve;
+            fp.ctx.error({ kind: 'network', message: 'x' });
+          }
+        }),
+    });
+    setup({}, [fp]);
+    d.commands.run('load', ['a.mp4 or b.mp4']);
+    await flush();
+    expect(fp.loads.map((l) => l.url)).toEqual(['a.mp4', 'b.mp4']);
+    resolveA();
+    await flush();
+    expect(d.store.get().status).toBe('loading');
+    expect(names()).not.toContain('metadata');
+  });
+
+  it('restores the retry budget after a successful load', async () => {
+    vi.useFakeTimers();
+    let attempts = 0;
+    const fp = fakeProvider({ fail: () => (++attempts === 1 ? { kind: 'network', message: 'x' } : null) });
+    setup({ reload: { retries: 1, delay: 100 } }, [fp]);
+    d.commands.run('load', ['a.mp4']);
+    await flush();
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(2);
+    expect(d.store.get().status).toBe('ready');
+    media.setError(3);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(attempts).toBe(3);
+    expect(d.store.get().status).toBe('ready');
+  });
+});
+
 describe('MediaController switching', () => {
   it('switches file-based quality keeping position, playback and audio label', async () => {
     const { providers: [p] } = setup();
@@ -232,5 +287,46 @@ describe('MediaController switching', () => {
     expect(p!.provider.detach).toHaveBeenCalled();
     expect(d.commands.has('load')).toBe(false);
     expect(d.commands.has('play')).toBe(false);
+  });
+
+  it('recovers from a fatal error when switching quality', async () => {
+    let broken = true;
+    const fp = fakeProvider({ fail: () => (broken ? { kind: 'network', message: 'x' } : null) });
+    setup({}, [fp]);
+    d.commands.run('load', ['[a]a.mp4,[b]b.mp4']);
+    await flush();
+    expect(d.store.get().status).toBe('error');
+    broken = false;
+    d.commands.run('setQuality', [0]);
+    await flush();
+    expect(d.store.get()).toMatchObject({ status: 'ready', error: null, quality: 0 });
+  });
+
+  it('does not emit pause when switching quality during playback', async () => {
+    let firePause = false;
+    const fp = fakeProvider({
+      load: async () => {
+        if (firePause) media.fire('pause');
+      },
+    });
+    setup({}, [fp]);
+    d.commands.run('load', ['[a]a.mp4,[b]b.mp4']);
+    await flush();
+    await d.video.play();
+    expect(d.store.get().status).toBe('playing');
+    emitted.length = 0;
+    firePause = true;
+    d.commands.run('setQuality', [0]);
+    await flush();
+    expect(names()).not.toContain('pause');
+    expect(d.store.get().status).toBe('playing');
+  });
+
+  it('keeps the intended start when switching before metadata', async () => {
+    const { providers: [p] } = setup({}, [fakeProvider({ load: async () => {} })]);
+    d.commands.run('load', ['[a]a.mp4,[b]b.mp4[seek:30]']);
+    d.commands.run('setQuality', [0]);
+    await flush();
+    expect(p!.loads.map((l) => l.start)).toEqual([30, 30]);
   });
 });

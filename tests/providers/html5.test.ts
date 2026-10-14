@@ -39,6 +39,7 @@ describe('html5Provider.load', () => {
     p.attach(video, ctx);
     const loading = p.load('https://a.com/v.mp4', 15);
     expect(video.getAttribute('src')).toBe('https://a.com/v.mp4');
+    expect(video.load).not.toHaveBeenCalled();
     video.dispatchEvent(new Event('loadedmetadata'));
     await loading;
     expect(video.currentTime).toBe(15);

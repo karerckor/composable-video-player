@@ -48,7 +48,6 @@ export function html5Provider(): MediaProvider {
         v.addEventListener('loadedmetadata', onMeta);
         v.addEventListener('error', onError);
         v.src = url;
-        v.load();
       });
     },
 
