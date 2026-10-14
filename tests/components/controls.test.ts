@@ -74,6 +74,24 @@ describe('mute', () => {
     expect(calls).toEqual([['setVolume', ['+0.05']]]);
   });
 
+  it('emits exactly one step per mouse notch and drops the remainder', () => {
+    const el = build('mute');
+    for (let i = 0; i < 3; i++) el.dispatchEvent(new WheelEvent('wheel', { deltaY: 120, cancelable: true }));
+    expect(calls).toEqual([['setVolume', ['-0.05']], ['setVolume', ['-0.05']], ['setVolume', ['-0.05']]]);
+    el.dispatchEvent(new WheelEvent('wheel', { deltaY: 10, cancelable: true }));
+    expect(calls).toHaveLength(3); // no carried remainder
+  });
+
+  it('resets the accumulator when the direction changes', () => {
+    const el = build('mute');
+    const wheel = (deltaY: number) => el.dispatchEvent(new WheelEvent('wheel', { deltaY, cancelable: true }));
+    wheel(-30);
+    wheel(30);
+    expect(calls).toEqual([]);
+    wheel(30);
+    expect(calls).toEqual([['setVolume', ['-0.05']]]);
+  });
+
   it('normalizes line-based deltas', () => {
     const el = build('mute');
     el.dispatchEvent(new WheelEvent('wheel', { deltaY: -4, deltaMode: 1, cancelable: true }));

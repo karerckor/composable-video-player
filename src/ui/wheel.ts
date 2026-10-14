@@ -6,16 +6,19 @@ const STEP_PX = 50;
  * Turns wheel events into discrete steps: normalizes `deltaMode`, ignores `deltaY === 0`,
  * accumulates 50px per step (so smooth-scrolling touchpads do not flood the player).
  * Returns +1 for up (negative `deltaY`), -1 for down, 0 while still accumulating.
- * At most one step is returned per event; any remainder carries over to the next event.
+ * At most one step is returned per event; the accumulator resets after a step (a mouse notch of
+ * ~100-120px is always exactly one step) and whenever the scroll direction changes.
  */
 export function createWheelStepper(): (e: WheelEvent) => -1 | 0 | 1 {
   let acc = 0;
   return (e) => {
     if (!e.deltaY) return 0;
-    acc += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+    const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+    if (acc !== 0 && Math.sign(delta) !== Math.sign(acc)) acc = 0;
+    acc += delta;
     if (Math.abs(acc) < STEP_PX) return 0;
     const up = acc < 0;
-    acc += up ? STEP_PX : -STEP_PX;
+    acc = 0;
     return up ? 1 : -1;
   };
 }
