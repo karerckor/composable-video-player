@@ -20,9 +20,15 @@ export function activeText(cues: Cue[], time: number): string {
     .join('\n');
 }
 
-const ENTITIES: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' };
-const decode = (s: string) => s.replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (m) => ENTITIES[m] ?? m);
-const TAG_RE = /<(\/?)([biu])>|<[^>]*>/g;
+const NAMED: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', nbsp: '\u00a0' };
+const decode = (s: string) =>
+  s.replace(/&(?:(amp|lt|gt|quot|nbsp)|#(\d+)|#x([0-9a-f]+));/gi, (match, name?: string, dec?: string, hex?: string) => {
+    if (name) return NAMED[name.toLowerCase()] ?? match;
+    const code = dec !== undefined ? Number(dec) : parseInt(hex ?? '', 16);
+    return Number.isInteger(code) && code >= 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : match;
+  });
+/** `<b>`/`<i>`/`<u>` (any case) are kept; any other tag starting with a letter, and VTT timestamps like `<00:01.000>`, are stripped. */
+const TAG_RE = /<(\/?)([biu])>|<\/?[a-z][^<>]*>|<\d[\d:.,]*>/gi;
 
 /** Builds DOM nodes for cue text: keeps <b>, <i>, <u> and newlines; strips everything else. */
 export function cueNodes(raw: string): Node[] {
@@ -49,7 +55,7 @@ export function cueNodes(raw: string): Node[] {
     if (closing) {
       if (stack.length > 1) stack.pop();
     } else {
-      const el = document.createElement(tag);
+      const el = document.createElement(tag.toLowerCase());
       top().appendChild(el);
       stack.push(el);
     }

@@ -116,4 +116,29 @@ describe('subtitlesPlugin', () => {
     expect(player.state.userActive).toBe(false);
     expect(layer.classList.contains('vp-subtitles-raised')).toBe(false);
   });
+
+  it('ignores a track fetch that resolves after a new source was loaded', async () => {
+    let resolveEn!: (r: Response) => void;
+    const slow = vi.fn((url: string) => (url === 'en.vtt' ? new Promise<Response>((r) => void (resolveEn = r)) : fetchMock(url)));
+    const { player } = setup({ subtitle: '[En]en.vtt', source: 'a.mp4' }, { fetch: slow as unknown as typeof fetch });
+    await flush();
+    expect(player.state.textTracks.map((t) => t.label)).toEqual(['En']);
+    player.api('play', 'b.mp4(subtitle:[Ru]ru.srt)');
+    await flush();
+    expect(player.state.textTracks.map((t) => t.label)).toEqual(['Ru']);
+    const before = player.state.textTracks;
+    resolveEn(new Response(FILES['en.vtt']));
+    await flush();
+    expect(player.state.textTracks).toBe(before);
+  });
+
+  it('does nothing on toggleSubtitles without tracks', async () => {
+    const { player } = setup({ source: 'a.mp4' });
+    await flush();
+    const events: string[] = [];
+    player.on('subtitle', (label) => events.push(label));
+    player.command('toggleSubtitles');
+    expect(events).toEqual([]);
+    expect(player.state.textTrack).toBe(-1);
+  });
 });

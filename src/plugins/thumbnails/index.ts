@@ -44,6 +44,7 @@ export function thumbnailsPlugin(o: ThumbnailsPluginOptions = {}): Plugin {
             if (id === request) thumbs = parseThumbnails(text, url);
           })
           .catch((e: unknown) => {
+            if (id !== request) return;
             ctx.log.warn(`thumbnails "${url}" failed to load`, e);
             ctx.events.emit('loaderror', { url, error: { kind: 'network', message: String(e) } });
           });

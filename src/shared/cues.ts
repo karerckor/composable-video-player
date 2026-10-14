@@ -10,7 +10,7 @@ export interface Cue {
 export function parseCues(input: string): Cue[] {
   const text = input.replace(/^﻿/, '').replace(/\r\n?/g, '\n');
   const cues: Cue[] = [];
-  for (const block of text.split(/\n{2,}/)) {
+  for (const block of text.split(/\n(?:[ \t]*\n)+/)) {
     const lines = block.split('\n');
     const timing = lines.findIndex((line) => line.includes('-->'));
     if (timing < 0) continue;

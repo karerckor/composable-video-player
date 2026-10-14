@@ -39,4 +39,20 @@ describe('subtitle helpers', () => {
     expect(div.querySelector('script, img')).toBeNull();
     expect(div.textContent).toBe('alert(1)ok');
   });
+
+  it('keeps plain angle brackets and handles tag case and timestamps', () => {
+    expect(render('1 < 2 and 3 > 2').textContent).toBe('1 < 2 and 3 > 2');
+    const upper = render('<B>x</B><I>y</I>');
+    expect(upper.querySelector('b')!.textContent).toBe('x');
+    expect(upper.querySelector('i')!.textContent).toBe('y');
+    expect(render('<00:00:01.000>word').textContent).toBe('word');
+    expect(render('<00:01.500>a<00:02.000>b').textContent).toBe('ab');
+  });
+
+  it('decodes nbsp and numeric entities', () => {
+    expect(render('&#8217;').textContent).toBe('\u2019');
+    expect(render('&#x41;').textContent).toBe('A');
+    expect(render('a&nbsp;b').textContent).toBe('a\u00a0b');
+    expect(render('&#1114112;').textContent).toBe('&#1114112;');
+  });
 });

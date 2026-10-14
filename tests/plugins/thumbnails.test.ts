@@ -63,4 +63,20 @@ describe('thumbnailsPlugin', () => {
     bus.emit('ui:timeline-hover', { time: 3, x: 10, rootX: 10, width: 400 });
     expect(image().hidden).toBe(true);
   });
+
+  it('ignores failures of superseded requests', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let rejectBad!: (e: Error) => void;
+    const lateFetch = vi.fn((url: string) =>
+      url === 'bad' ? new Promise<Response>((_, reject) => void (rejectBad = reject)) : Promise.resolve(new Response(VTT)),
+    );
+    const t = createTestPlayer({ plugins: [thumbnailsPlugin({ fetch: lateFetch as unknown as typeof fetch })], source: 'a.mp4' });
+    const errors: string[] = [];
+    t.player.on('loaderror', ({ url }) => errors.push(url));
+    t.player.command('setThumbnails', 'bad');
+    t.player.command('setThumbnails', 'https://a.com/t.vtt');
+    rejectBad(new Error('late'));
+    await flush();
+    expect(errors).toEqual([]);
+  });
 });

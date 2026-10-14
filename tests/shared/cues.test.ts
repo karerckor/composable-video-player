@@ -24,4 +24,13 @@ describe('parseCues', () => {
       { start: 9, end: 10, text: 'B' },
     ]);
   });
+
+  it('treats whitespace-only lines as block separators', () => {
+    const srt = '1\n00:00:01,000 --> 00:00:02,000\nA\n \n2\n00:00:03,000 --> 00:00:04,000\nB\n\t\n3\n00:00:05,000 --> 00:00:06,000\nC';
+    expect(parseCues(srt)).toEqual([
+      { start: 1, end: 2, text: 'A' },
+      { start: 3, end: 4, text: 'B' },
+      { start: 5, end: 6, text: 'C' },
+    ]);
+  });
 });
