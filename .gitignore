@@ -4,3 +4,4 @@ demo/assets/
 .playwright-mcp/
 *.log
 .DS_Store
+/site/

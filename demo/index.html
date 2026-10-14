@@ -51,13 +51,13 @@
 
       <section>
         <h2>2. Audio tracks</h2>
-        <p><code>{English}…;{Русский}…</code> — separate files per language (440 Hz vs 660 Hz tone).</p>
+        <p><code>{English}…;{Russian}…</code> — separate files per language (440 Hz vs 660 Hz tone).</p>
         <div id="p-audio"></div>
       </section>
 
       <section>
         <h2>3. HLS</h2>
-        <p>Adaptive stream via lazily loaded hls.js (native in Safari). Qualities come from the manifest, with “Авто”.</p>
+        <p>Adaptive stream via lazily loaded hls.js (native in Safari). Qualities come from the manifest, with “Auto”.</p>
         <div id="p-hls"></div>
         <div class="row">
           <button class="demo" data-hls="assets/hls/master.m3u8">Local HLS</button>
@@ -115,10 +115,10 @@
           <div id="p-theme"></div>
           <div>
             <div class="row" style="margin: 0 0 10px">
-              <button class="demo" data-preset="default">По умолчанию</button>
-              <button class="demo" data-preset="light">Светлая</button>
-              <button class="demo" data-preset="neon">Неон</button>
-              <button class="demo" data-preset="retro">Ретро</button>
+              <button class="demo" data-preset="default">Default</button>
+              <button class="demo" data-preset="light">Light</button>
+              <button class="demo" data-preset="neon">Neon</button>
+              <button class="demo" data-preset="retro">Retro</button>
             </div>
             <div id="theme-controls">
               <label>color1 <input type="color" data-key="color1" /></label>
@@ -139,8 +139,8 @@
         <h2>9. Example plugins: timecodes and share with a timestamp</h2>
         <p>
           Both live in <code>demo/plugins/</code> and use only the public API. <b>Timecodes</b>: <code>timecodes</code> option in YouTube description format →
-          gaps on the timeline, chapter name on hover and in the toolbar, a «Главы» submenu in settings. <b>Share</b>: the arrow button opens a panel with
-          the link and «Начать с 0:12»; opening <a href="?t=16">?t=16</a> starts this player at 0:16.
+          gaps on the timeline, chapter name on hover and in the toolbar, a “Chapters” submenu in settings. <b>Share</b>: the arrow button opens a panel with
+          the link and “Start at 0:12”; opening <a href="?t=16">?t=16</a> starts this player at 0:16.
         </p>
         <div id="p-plugins"></div>
         <ul id="timecodes"></ul>

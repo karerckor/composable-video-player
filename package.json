@@ -1,17 +1,43 @@
 {
   "name": "composable-video-player",
   "version": "0.1.0",
-  "description": "Composable, extensible PlayerJS-like video player in pure TypeScript",
+  "description": "Composable, extensible PlayerJS-like HTML5/HLS video player in pure TypeScript. Zero runtime dependencies.",
+  "keywords": [
+    "video",
+    "player",
+    "video-player",
+    "html5",
+    "hls",
+    "playerjs",
+    "typescript",
+    "subtitles",
+    "playlist",
+    "media"
+  ],
+  "homepage": "https://karerckor.github.io/composable-video-player/",
+  "bugs": {
+    "url": "https://github.com/karerckor/composable-video-player/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karerckor/composable-video-player.git"
+  },
+  "license": "MIT",
+  "author": "karerckor",
   "type": "module",
   "main": "./dist/player.umd.cjs",
   "module": "./dist/player.js",
   "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/player.umd.js",
+  "jsdelivr": "./dist/player.umd.js",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/player.js",
       "require": "./dist/player.umd.cjs"
-    }
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
@@ -19,20 +45,28 @@
   "sideEffects": [
     "*.css",
     "./dist/player.umd.cjs",
-    "./src/umd.ts"
+    "./dist/player.umd.js"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "dev": "vite demo --config vite.config.ts",
-    "build": "vite build && vite build -c vite.umd.config.ts && tsc -p tsconfig.build.json",
+    "build": "vite build && vite build -c vite.umd.config.ts && node scripts/copy-umd.mjs && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "check:types-consumer": "npm run build && bash scripts/check-consumer.sh",
     "assets": "bash demo/scripts/make-assets.sh",
-    "demo:umd": "npm run build && cp dist/player.umd.cjs demo/assets/player.umd.js && cp dist/player.umd.cjs.map demo/assets/player.umd.cjs.map"
+    "demo:umd": "npm run build && cp dist/player.umd.js demo/assets/player.umd.js && cp dist/player.umd.cjs.map demo/assets/player.umd.cjs.map",
+    "site": "npm run build && vite build -c vite.site.config.ts && node scripts/build-site.mjs",
+    "site:preview": "vite preview --outDir site --port 4173",
+    "prepublishOnly": "npm test && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "jsdom": "^29.1.1",
+    "marked": "^18.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
     "vitest": "^5.0.4"

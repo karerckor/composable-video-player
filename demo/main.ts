@@ -29,7 +29,7 @@ track(
     container: 'p-basic',
     source: `[360p]${both('video-360')},[720p]${both('video-720')}`,
     title: 'Test pattern — 360p / 720p',
-    subtitle: '[English]assets/en.vtt,[Русский]assets/ru.srt',
+    subtitle: '[English]assets/en.vtt,[Russian]assets/ru.srt',
     thumbnails: 'assets/thumbs.vtt',
     cuid: 'demo-basic',
   }),
@@ -40,7 +40,7 @@ track(
   'audio',
   createPlayer({
     container: 'p-audio',
-    source: `[720p]{English}${both('video-720')};{Русский}${both('video-720-ru')}`,
+    source: `[720p]{English}${both('video-720')};{Russian}${both('video-720-ru')}`,
     title: 'Audio tracks',
   }),
 );

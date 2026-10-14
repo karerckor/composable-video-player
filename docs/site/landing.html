@@ -1,0 +1,78 @@
+<section class="hero">
+  <h1>Composable video player</h1>
+  <p class="lead">
+    A PlayerJS-like HTML5 / HLS player in pure TypeScript. Zero runtime dependencies, a declarative JSON layout, CSS-variable theming and a
+    small plugin API. ~30&nbsp;KB gzipped.
+  </p>
+  <p class="actions">
+    <a class="button primary" href="guide/getting-started.html">Get started</a>
+    <a class="button" href="demo/">Live demo</a>
+    <a class="button" href="{{repo}}">GitHub</a>
+  </p>
+  <div id="hero-player" class="hero-player"></div>
+</section>
+
+<section>
+  <h2>Install</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>npm</h3>
+      <pre><code>npm install {{name}}</code></pre>
+      <pre><code>import { createPlayer } from '{{name}}';
+
+createPlayer({
+  container: 'player',
+  source: '[360p]low.mp4,[720p]high.mp4',
+  subtitle: '[English]en.vtt',
+});</code></pre>
+    </div>
+    <div class="card">
+      <h3>CDN &lt;script&gt;</h3>
+      <pre><code>&lt;div id="player"&gt;&lt;/div&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/{{name}}@{{range}}/dist/player.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VP.createPlayer({ container: 'player', source: 'video.mp4' });
+&lt;/script&gt;</code></pre>
+      <p class="note">Also on <a href="https://unpkg.com/{{name}}@{{range}}/dist/player.umd.js">unpkg</a> and, always the latest build, on this site: <code>cdn/player.umd.js</code>.</p>
+    </div>
+    <div class="card">
+      <h3>CDN ES module</h3>
+      <pre><code>&lt;script type="module"&gt;
+  import { createPlayer } from
+    'https://cdn.jsdelivr.net/npm/{{name}}@{{range}}/dist/player.js';
+  createPlayer({ container: 'player', source: 'stream.m3u8' });
+&lt;/script&gt;</code></pre>
+      <p class="note">PlayerJS embeds work too: <code>new Playerjs({ id, file })</code>. See <a href="guide/playerjs-compat.html">compat</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Features</h2>
+  <ul class="features">
+    <li><b>Sources</b> — qualities, audio tracks, <code>or</code> fallbacks, playlists with folders, HLS via lazily loaded hls.js.</li>
+    <li><b>Plugins</b> — quality, speed, audio tracks, VTT/SRT subtitles, sprite thumbnails, playlist, hotkeys, memory, autoplay, Media Session.</li>
+    <li><b>Layout</b> — the UI is a JSON tree of components with anchors, hide rules and action strings. Headless with <code>layout: false</code>.</li>
+    <li><b>Theme</b> — CSS custom properties or the <code>theme</code> option; light themes work out of the box.</li>
+    <li><b>Typed API</b> — commands, events and state are fully typed; plugins extend options and commands via module augmentation.</li>
+    <li><b>PlayerJS compat</b> — <code>new Playerjs({...})</code>, <code>api(cmd, arg)</code>, <code>PlayerjsEvents</code> and postMessage.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Documentation</h2>
+  <ol class="guide-list">{{guides}}</ol>
+</section>
+
+<footer class="footer">MIT · v{{version}} · <a href="{{repo}}">{{repo}}</a></footer>
+
+<script src="cdn/player.umd.js"></script>
+<script>
+  VP.createPlayer({
+    container: 'hero-player',
+    source: '[360p]demo/assets/video-360.webm or demo/assets/video-360.mp4,[720p]demo/assets/video-720.webm or demo/assets/video-720.mp4',
+    title: 'Test pattern',
+    subtitle: '[English]demo/assets/en.vtt',
+    thumbnails: 'demo/assets/thumbs.vtt',
+  });
+</script>

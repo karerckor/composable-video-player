@@ -135,8 +135,17 @@ const PRESETS: Record<string, Partial<ThemeVars>> = {
     timelineHeight: '6px',
     subColor: '#f0abfc',
   },
-  // TODO(you): design the "Ретро" preset.
-  retro: {},
+  retro: {
+    color1: '#f59e0b',
+    color2: '#fde68a',
+    color3: 'rgba(41, 24, 10, 0.96)',
+    toolbarBg: 'linear-gradient(to top, rgba(41, 24, 10, 0.9), rgba(41, 24, 10, 0))',
+    font: "'Courier New', ui-monospace, monospace",
+    radius: '0px',
+    timelineHeight: '8px',
+    subColor: '#fde68a',
+    subBg: 'rgba(41, 24, 10, 0.85)',
+  },
 };
 
 /** Same naming rule as the `theme` option: color1 → --vp-color-1, toolbarBg → --vp-toolbar-bg. */

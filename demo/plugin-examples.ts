@@ -4,11 +4,11 @@ import { sharePlugin } from './plugins/share.js';
 
 type Track = (id: string, player: Player) => void;
 
-const TIMECODES = `0:00 Заставка
-0:05 Красная полоса
-0:10 Зелёная полоса
-0:16 Синяя полоса
-0:22 Финал`;
+const TIMECODES = `0:00 Intro
+0:05 Red bar
+0:10 Green bar
+0:16 Blue bar
+0:22 Finale`;
 
 export function setupPluginExamples(track: Track): void {
   // Default layout + the plugins' components: chapter name after the duration, share before settings.
@@ -20,7 +20,7 @@ export function setupPluginExamples(track: Track): void {
   const player = createPlayer({
     container: 'p-plugins',
     source: 'assets/video-720.webm or assets/video-720.mp4',
-    title: 'Плагины: таймкоды и «Поделиться»',
+    title: 'Plugins: timecodes and share',
     thumbnails: 'assets/thumbs.vtt',
     timecodes: TIMECODES,
     layout,

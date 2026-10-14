@@ -3,7 +3,7 @@ import { formatTime, type Plugin, type TimelineMarker } from '../../src/index.js
 /**
  * Example plugin: YouTube-style timecodes ("chapters").
  * - `timecodes` option in description format: one "0:00 Title" per line;
- * - ticks on the timeline (via state.markers), a "Главы" settings submenu,
+ * - ticks on the timeline (via state.markers), a "Chapters" settings submenu,
  *   the chapter name on timeline hover and a `chapter-title` component for layouts.
  */
 
@@ -86,7 +86,7 @@ export function timecodesPlugin(o: { timecodes?: string } = {}): Plugin {
         ctx.commands.register('setTimecodes', ([text]) => set(text)),
         ctx.registerMenu({
           id: 'chapters',
-          label: 'Главы',
+          label: 'Chapters',
           order: 5,
           visible: (s) => labelled(s.markers).length > 0,
           options: (s) => labelled(s.markers).map((c) => ({ label: `${formatTime(c.time)}  ${c.label}`, value: c.time })),

@@ -58,7 +58,7 @@ export function sharePlugin(o: SharePluginOptions = {}): Plugin {
 
       ctx.registerComponent('share', (ui) => {
         const button = createIconButton(ui, 'demo-share', () => panel?.toggle());
-        button.setLabel('Поделиться');
+        button.setLabel('Share');
         button.el.replaceChildren(shareIcon());
         return { el: button.el };
       });
@@ -67,16 +67,16 @@ export function sharePlugin(o: SharePluginOptions = {}): Plugin {
         const el = document.createElement('div');
         el.className = 'demo-share-panel vp-hidden';
         el.setAttribute('role', 'dialog');
-        el.setAttribute('aria-label', 'Поделиться');
+        el.setAttribute('aria-label', ui.t('Share'));
 
         const title = document.createElement('div');
         title.className = 'demo-share-title';
-        title.textContent = 'Поделиться';
+        title.textContent = ui.t('Share');
         const close = document.createElement('button');
         close.className = 'vp-button demo-share-close';
         close.type = 'button';
         close.textContent = '✕';
-        close.setAttribute('aria-label', 'Закрыть');
+        close.setAttribute('aria-label', ui.t('close'));
         title.append(close);
 
         const input = document.createElement('input');
@@ -90,14 +90,14 @@ export function sharePlugin(o: SharePluginOptions = {}): Plugin {
         const copy = document.createElement('button');
         copy.className = 'vp-button demo-share-copy';
         copy.type = 'button';
-        copy.textContent = 'Копировать';
+        copy.textContent = ui.t('Copy');
         el.append(title, input, atLabel, copy);
 
         let time = 0;
         const render = () => {
           input.value = buildShareUrl(pageUrl(), param, at.checked ? time : null);
-          atText.textContent = `Начать с ${formatTime(time)}`;
-          copy.textContent = 'Копировать';
+          atText.textContent = `${ui.t('Start at')} ${formatTime(time)}`;
+          copy.textContent = ui.t('Copy');
         };
         const open = () => {
           time = ui.store.get().currentTime;
@@ -121,10 +121,10 @@ export function sharePlugin(o: SharePluginOptions = {}): Plugin {
         });
         ui.listen(copy, 'click', () => {
           const done = (text: string) => (copy.textContent = text);
-          if (!navigator.clipboard) return void (input.select(), done('Нажмите ⌘C / Ctrl+C'));
+          if (!navigator.clipboard) return void (input.select(), done(ui.t('Press ⌘C / Ctrl+C')));
           navigator.clipboard.writeText(input.value).then(
-            () => done('Скопировано ✓'),
-            () => (input.select(), done('Нажмите ⌘C / Ctrl+C')),
+            () => done(ui.t('Copied ✓')),
+            () => (input.select(), done(ui.t('Press ⌘C / Ctrl+C'))),
           );
         });
         return {
