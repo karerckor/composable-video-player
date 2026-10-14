@@ -90,4 +90,23 @@ describe('mapPlayerjsOptions', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(() => mapPlayerjsOptions({} as never, log)).toThrow(/id/);
   });
+
+  it('drops non-finite numbers and non-object hlsconfig', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    warn.mockClear();
+    const out = mapPlayerjsOptions({ id: 'p', volume: 'abc', start: 'x', hlsconfig: '5' }, log);
+    expect(out).toEqual({ container: 'p' });
+    expect('volume' in out).toBe(false);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(mapPlayerjsOptions({ id: 'p', hlsconfig: '[1]' }, log).hlsConfig).toBeUndefined();
+  });
+
+  it('treats inherited and prototype-like keys as unknown', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    warn.mockClear();
+    const input = JSON.parse('{"id":"p","__proto__":{"x":1},"toString":1,"constructor":2}');
+    const out = mapPlayerjsOptions(input, log);
+    expect(out).toEqual({ container: 'p' });
+    expect(warn).toHaveBeenCalledTimes(3);
+  });
 });

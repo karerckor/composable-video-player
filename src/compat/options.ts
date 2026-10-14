@@ -14,14 +14,18 @@ export interface PlayerjsOptions {
 }
 
 export const flag = (v: unknown) => v === true || v === 1 || v === '1' || v === 'true';
-const num = (v: unknown) => Number(v);
+const num = (v: unknown) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+};
 const str = (v: unknown) => String(v);
 
 type Mapper = (value: unknown, out: Partial<PlayerOptions>) => void;
 const set =
   <K extends keyof PlayerOptions>(key: K, convert: (v: unknown) => PlayerOptions[K]): Mapper =>
   (value, out) => {
-    out[key] = convert(value);
+    const converted = convert(value);
+    if (converted !== undefined) out[key] = converted;
   };
 const color =
   (key: keyof ThemeVars): Mapper =>
@@ -61,13 +65,20 @@ const TABLE: Record<string, Mapper> = {
     if (flag(value)) out.forceType = 'hls';
   },
   hlsconfig: set('hlsConfig', (v) => {
-    if (typeof v !== 'string') return v as Record<string, unknown>;
-    try {
-      return JSON.parse(v) as Record<string, unknown>;
-    } catch {
-      console.warn('[vp] Playerjs: hlsconfig is not valid JSON; ignored');
+    let parsed = v;
+    if (typeof v === 'string') {
+      try {
+        parsed = JSON.parse(v);
+      } catch {
+        console.warn('[vp] Playerjs: hlsconfig is not valid JSON; ignored');
+        return undefined;
+      }
+    }
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      console.warn('[vp] Playerjs: hlsconfig must be an object; ignored');
       return undefined;
     }
+    return parsed as Record<string, unknown>;
   }),
   log: set('log', flag),
   color1: color('color1'),
@@ -83,8 +94,7 @@ export function mapPlayerjsOptions(input: PlayerjsOptions, log: Logger): PlayerO
   const out: Partial<PlayerOptions> = {};
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined || COMPAT_ONLY.has(key)) continue;
-    const mapper = TABLE[key];
-    if (mapper) mapper(value, out);
+    if (Object.prototype.hasOwnProperty.call(TABLE, key)) TABLE[key]!(value, out);
     else log.warn(`Playerjs: unknown option "${key}" ignored`);
   }
   return out as PlayerOptions;

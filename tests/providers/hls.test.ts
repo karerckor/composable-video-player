@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { hlsProvider, loadHlsScript, resetHlsLoader, type HlsConstructor } from '../../src/providers/hls';
+import { DEFAULT_HLS_INTEGRITY, DEFAULT_HLS_URL, hlsProvider, loadHlsScript, resetHlsLoader, type HlsConstructor } from '../../src/providers/hls';
 import { createLogger } from '../../src/core/logger';
 import type { PlayerError, ProviderContext, Quality, SourceSpec, TrackInfo } from '../../src/types';
 
@@ -65,7 +65,7 @@ async function loaded(start = 0) {
   const loading = p.load('https://a.com/master.m3u8', start);
   await Promise.resolve();
   await Promise.resolve();
-  const hls = FakeHls.instances[0]!;
+  const hls = FakeHls.instances[FakeHls.instances.length - 1]!;
   return { p, loading, hls };
 }
 
@@ -121,14 +121,85 @@ describe('hlsProvider.load', () => {
     expect(hls.audioTrack).toBe(1);
   });
 
-  it('recovers once from fatal network and media errors, then rejects', async () => {
+  it('rejects immediately on a fatal error before metadata, without retrying', async () => {
+    const a = await loaded();
+    a.hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'manifestLoadError' });
+    await expect(a.loading).rejects.toEqual({ kind: 'network', message: 'manifestLoadError' });
+    expect(a.hls.startLoad).not.toHaveBeenCalled();
+
+    const b = await loaded();
+    b.hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'manifestLoadError', response: { code: 404 } });
+    await expect(b.loading).rejects.toEqual({ kind: 'not-found', message: 'manifestLoadError' });
+
+    const c = await loaded();
+    c.hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'mediaError', details: 'bufferStalled' });
+    await expect(c.loading).rejects.toEqual({ kind: 'decode', message: 'bufferStalled' });
+    expect(c.hls.recoverMediaError).not.toHaveBeenCalled();
+  });
+
+  it('recovers once from fatal network and media errors after metadata, then reports', async () => {
     const { loading, hls } = await loaded();
-    hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'manifestLoadError' });
+    video.dispatchEvent(new Event('loadedmetadata'));
+    await loading;
+    hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'fragLoadError' });
     expect(hls.startLoad).toHaveBeenCalledTimes(1);
     hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'mediaError', details: 'bufferStalled' });
     expect(hls.recoverMediaError).toHaveBeenCalledTimes(1);
-    hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'manifestLoadError', response: { code: 404 } });
-    await expect(loading).rejects.toEqual({ kind: 'not-found', message: 'manifestLoadError' });
+    expect(errors).toEqual([]);
+    hls.emit(FakeHls.Events.ERROR, { fatal: true, type: 'networkError', details: 'fragLoadError' });
+    expect(errors).toEqual([{ kind: 'network', message: 'fragLoadError' }]);
+  });
+
+  it('publishes audio tracks from AUDIO_TRACKS_UPDATED', async () => {
+    const { hls } = await loaded();
+    const tracks = hls.audioTracks;
+    hls.audioTracks = [];
+    hls.emit(FakeHls.Events.MANIFEST_PARSED);
+    expect(audio).toEqual([]);
+    hls.audioTracks = tracks;
+    hls.emit(FakeHls.Events.AUDIO_TRACKS_UPDATED);
+    expect(audio[0]).toEqual([[{ label: 'English', lang: 'en' }, { label: 'Русский', lang: 'ru' }], 0]);
+  });
+
+  it('drops a load superseded by detach and a new load', async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const p = hlsProvider({ loader: async () => (await gate, FakeHls as unknown as HlsConstructor) });
+    p.attach(video, ctx);
+    const a = p.load('a.m3u8', 0);
+    const aResult = a.then(() => 'ok', (e) => e);
+    p.detach();
+    p.attach(video, ctx);
+    const b = p.load('b.m3u8', 0);
+    release();
+    await expect(aResult).resolves.toEqual({ kind: 'unknown', message: 'superseded' });
+    await Promise.resolve();
+    expect(FakeHls.instances).toHaveLength(1);
+    expect(FakeHls.instances[0]!.loadSource).toHaveBeenCalledWith('b.m3u8');
+    video.dispatchEvent(new Event('loadedmetadata'));
+    await expect(b).resolves.toBeUndefined();
+  });
+
+  it('loads the pinned hls.js with SRI by default and no integrity for a custom hlsUrl', async () => {
+    const p = hlsProvider();
+    p.attach(video, ctx);
+    const loading = p.load('a.m3u8', 0);
+    const script = document.head.querySelector(`script[src="${DEFAULT_HLS_URL}"]`) as HTMLScriptElement;
+    expect(DEFAULT_HLS_URL).toContain('hls.js@1.7.3');
+    expect(script.integrity).toBe(DEFAULT_HLS_INTEGRITY);
+    expect(script.crossOrigin).toBe('anonymous');
+    script.dispatchEvent(new Event('error'));
+    await expect(loading).rejects.toMatchObject({ kind: 'unsupported' });
+
+    ctx.options = { ...ctx.options, hlsUrl: 'https://own/hls.js' };
+    const q = hlsProvider();
+    q.attach(video, ctx);
+    const loading2 = q.load('a.m3u8', 0);
+    const custom = document.head.querySelector('script[src="https://own/hls.js"]') as HTMLScriptElement;
+    expect(custom.hasAttribute('integrity')).toBe(false);
+    expect(custom.hasAttribute('crossorigin')).toBe(false);
+    custom.dispatchEvent(new Event('error'));
+    await expect(loading2).rejects.toMatchObject({ kind: 'unsupported' });
   });
 
   it('ignores non-fatal errors and reports fatal errors after load through ctx.error', async () => {

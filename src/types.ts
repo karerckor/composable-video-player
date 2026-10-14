@@ -416,6 +416,8 @@ export interface PlayerOptions {
   idleTimeout?: number;
   reload?: { retries: number; delay: number };
   hlsUrl?: string;
+  /** Subresource Integrity hash for `hlsUrl`; defaults to the pinned hash only when `hlsUrl` is not set. */
+  hlsIntegrity?: string;
   hlsConfig?: Record<string, unknown>;
   log?: boolean;
 }
