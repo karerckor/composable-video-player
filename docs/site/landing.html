@@ -1,78 +1,53 @@
-<section class="hero">
-  <h1>Composable video player</h1>
-  <p class="lead">
-    A PlayerJS-like HTML5 / HLS player in pure TypeScript. Zero runtime dependencies, a declarative JSON layout, CSS-variable theming and a
-    small plugin API. ~30&nbsp;KB gzipped.
-  </p>
-  <p class="actions">
-    <a class="button primary" href="guide/getting-started.html">Get started</a>
-    <a class="button" href="demo/">Live demo</a>
-    <a class="button" href="{{repo}}">GitHub</a>
-  </p>
-  <div id="hero-player" class="hero-player"></div>
-</section>
+<div class="landing">
+  <section class="case-hero">
+    <div class="case-copy">
+      <p class="eyebrow">COMPOSABLE VIDEO PLAYER · OPEN SOURCE</p>
+      <h1>Build a video library<br /><em>people can navigate.</em></h1>
+      <p class="lead">A working home for tutorials and recorded talks. Find a chapter, read along, share a moment — and see the player code behind it.</p>
+      <p class="actions">
+        <a class="button primary" href="examples/stream-library/">Try the video library <span aria-hidden="true">↗</span></a>
+        <a class="button" href="guide/video-library.html">Read the walkthrough</a>
+      </p>
+      <p class="stack-label">TypeScript player <span>+</span> Cloudflare Stream <span>+</span> Hono / Workers</p>
+    </div>
+    <a class="case-preview" href="examples/stream-library/" aria-label="Open the working Fieldnotes video library">
+      <div class="preview-bar"><i></i><i></i><i></i><span>A real example you can run</span></div>
+      <img src="assets/images/video-library.png" alt="Fieldnotes: a searchable library of six Cloudflare TV recordings with categories and chapter links" width="1240" height="1135" />
+      <span class="preview-caption">Fieldnotes · built with the published player package <b>Explore the app ↗</b></span>
+    </a>
+  </section>
 
-<section>
-  <h2>Install</h2>
-  <div class="cards">
-    <div class="card">
-      <h3>npm</h3>
-      <pre><code>npm install {{name}}</code></pre>
-      <pre><code>import { createPlayer } from '{{name}}';
+  <section class="try-section" id="examples">
+    <div class="section-intro"><p class="eyebrow">A FEW THINGS TO TRY</p><h2>See what the player makes possible.</h2><p>Each example runs on the same player. The source is right beside it.</p></div>
+    <div class="use-cases">
+      <article class="use-case"><span class="step">01 / FIND</span><h3>Get to the useful part.</h3><p>Search chapter titles, jump into a recording, and follow its original captions in a clickable transcript.</p><a href="examples/stream-library/?video=developer-week-deep-dives&amp;t=777">Jump to a chapter ↗</a><code>player.seek(777)</code></article>
+      <article class="use-case"><span class="step">02 / SHARE</span><h3>Send the exact moment.</h3><p>A custom Share plugin adds its own control and panel inside the player — including fullscreen and links with a start time.</p><a href="examples/stream-library/?video=stream-live&amp;t=83">Try timecoded sharing ↗</a><code>player.command('openShare', true)</code></article>
+      <article class="use-case"><span class="step">03 / EXTEND</span><h3>Connect a VAST preroll.</h3><p>An optional Google IMA plugin pauses content for an ad, honors Skip, and returns to the video after completion or an error.</p><a href="examples/stream-library/?video=stream-live&amp;t=83#ad-demo">Try the advertising demo ↗</a><code>player.command('playPreroll', tag)</code></article>
+    </div>
+    <p class="case-note">The public preview runs in your browser with public Stream media. The deployable example includes the Hono backend. VAST playback is supplied by Google IMA through an example plugin.</p>
+  </section>
 
-createPlayer({
+  <section class="build-section">
+    <div><p class="eyebrow">TAKE IT APART. MAKE IT YOURS.</p><h2>Start with a working application.</h2><p>Extract the example, customize the library and colors, then deploy it to your own Cloudflare account.</p><p>Keep the player, replace the interface, or reuse the Share and IMA plugins in another application.</p><p class="actions"><a class="button primary" href="{{repo}}/tree/main/examples/cloudflare-stream">Get the example ↗</a><a class="button" href="guide/video-library.html">How the pieces fit</a></p></div>
+    <div class="build-code"><span class="code-label">STANDALONE EXAMPLE</span><pre><code class="language-bash">npx gitpick \
+  https://github.com/karerckor/composable-video-player/tree/main/examples/cloudflare-stream \
+  my-video-library
+
+cd my-video-library
+npm install
+npm run dev
+
+# After configuring your Stream account:
+npm run deploy</code></pre><p>Node.js 22+ · No account needed to try public demo mode.</p></div>
+  </section>
+
+  <section class="reference-section"><div><p class="eyebrow">THE PLAYER UNDERNEATH</p><h2>A small API. Room for your own features.</h2><p>HTML5 and HLS playback, quality and audio selection, captions, playback memory, declarative layouts and CSS-variable themes. Custom plugins register components, layers and typed commands.</p><p class="actions"><a class="button" href="demo/">Technical playground ↗</a><a class="button" href="guide/getting-started.html">API documentation</a><a class="button" href="{{repo}}">GitHub ↗</a></p></div><div class="install-code"><pre><code class="language-bash">npm install {{name}}</code></pre><pre><code class="language-typescript">import { createPlayer } from '{{name}}';
+
+const player = createPlayer({
   container: 'player',
-  source: '[360p]low.mp4,[720p]high.mp4',
-  subtitle: '[English]en.vtt',
-});</code></pre>
-    </div>
-    <div class="card">
-      <h3>CDN &lt;script&gt;</h3>
-      <pre><code>&lt;div id="player"&gt;&lt;/div&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/{{name}}@{{range}}/dist/player.umd.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  VP.createPlayer({ container: 'player', source: 'video.mp4' });
-&lt;/script&gt;</code></pre>
-      <p class="note">Also on <a href="https://unpkg.com/{{name}}@{{range}}/dist/player.umd.js">unpkg</a> and, always the latest build, on this site: <code>cdn/player.umd.js</code>.</p>
-    </div>
-    <div class="card">
-      <h3>CDN ES module</h3>
-      <pre><code>&lt;script type="module"&gt;
-  import { createPlayer } from
-    'https://cdn.jsdelivr.net/npm/{{name}}@{{range}}/dist/player.js';
-  createPlayer({ container: 'player', source: 'stream.m3u8' });
-&lt;/script&gt;</code></pre>
-      <p class="note">PlayerJS embeds work too: <code>new Playerjs({ id, file })</code>. See <a href="guide/playerjs-compat.html">compat</a>.</p>
-    </div>
-  </div>
-</section>
+  source: 'video.m3u8',
+});</code></pre></div></section>
 
-<section>
-  <h2>Features</h2>
-  <ul class="features">
-    <li><b>Sources</b> — qualities, audio tracks, <code>or</code> fallbacks, playlists with folders, HLS via lazily loaded hls.js.</li>
-    <li><b>Plugins</b> — quality, speed, audio tracks, VTT/SRT subtitles, sprite thumbnails, playlist, hotkeys, memory, autoplay, Media Session.</li>
-    <li><b>Layout</b> — the UI is a JSON tree of components with anchors, hide rules and action strings. Headless with <code>layout: false</code>.</li>
-    <li><b>Theme</b> — CSS custom properties or the <code>theme</code> option; light themes work out of the box.</li>
-    <li><b>Typed API</b> — commands, events and state are fully typed; plugins extend options and commands via module augmentation.</li>
-    <li><b>PlayerJS compat</b> — <code>new Playerjs({...})</code>, <code>api(cmd, arg)</code>, <code>PlayerjsEvents</code> and postMessage.</li>
-  </ul>
-</section>
-
-<section>
-  <h2>Documentation</h2>
-  <ol class="guide-list">{{guides}}</ol>
-</section>
-
-<footer class="footer">MIT · v{{version}} · <a href="{{repo}}">{{repo}}</a></footer>
-
-<script src="cdn/player.umd.js"></script>
-<script>
-  VP.createPlayer({
-    container: 'hero-player',
-    source: '[360p]demo/assets/video-360.webm or demo/assets/video-360.mp4,[720p]demo/assets/video-720.webm or demo/assets/video-720.mp4',
-    title: 'Test pattern',
-    subtitle: '[English]demo/assets/en.vtt',
-    thumbnails: 'demo/assets/thumbs.vtt',
-  });
-</script>
+  <details class="reference-guides"><summary>Browse the full documentation</summary><ol class="guide-list">{{guides}}</ol></details>
+  <footer class="footer">MIT · v{{version}} · <a href="{{repo}}">{{name}}</a></footer>
+</div>

@@ -1,0 +1,31 @@
+{
+  "name": "stream-library-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run build && wrangler dev",
+    "build": "node scripts/build.mjs",
+    "build:preview": "node scripts/build.mjs --pages",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:stream": "node --import tsx --test tests/stream.integration.ts",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:dry-run": "npm run build && wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "composable-video-player": "0.1.0",
+    "highlight.js": "^11.12.0",
+    "hono": "^4.13.16"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.158.0"
+  }
+}

@@ -356,7 +356,13 @@ How it is built, using only the public API:
 
 The demo plugins import from `../../src/index.js` and augment `../../src/types.js`. If you copy them into your project, change both to `'composable-video-player'`.
 
+## Example: VAST advertising
+
+The Cloudflare Stream example also includes an [IMA preroll plugin](https://github.com/karerckor/composable-video-player/blob/main/examples/cloudflare-stream/src/plugins/ima.ts). It combines `addLayer`, typed commands and `commands.before` with Google IMA to demonstrate VAST advertising, skip/error fallback and content continuation. VAST is handled by the external IMA SDK; it is not part of the player core. The [example README](https://github.com/karerckor/composable-video-player/tree/main/examples/cloudflare-stream#vast-advertising-a-useful-integration-example) covers the runnable demo and reuse.
+
 ## Example: share with timestamp
+
+The [deployable Cloudflare Stream library](https://github.com/karerckor/composable-video-player/tree/main/examples/cloudflare-stream) also includes a standalone [Share plugin](https://github.com/karerckor/composable-video-player/blob/main/examples/cloudflare-stream/src/plugins/share.ts). It adds a toolbar button and typed `player.command('openShare', true)` command, with plain/timecoded links and a panel inside the player. Its watch pages show the real plugin source, current setup and interactive public API examples.
 
 Source: [demo/plugins/share.ts](https://github.com/karerckor/composable-video-player/blob/main/demo/plugins/share.ts). It adds a **Share** button with a panel that shows the page link, a "Start at 1:23" checkbox, and Copy. Opening a link with `?t=83`, `?t=1m23s`, or `?t=1:23` starts the video there.
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A local VAST fixture, not a live ad campaign. Media stays hosted by Google. -->
+<VAST version="3.0">
+  <Ad id="fieldnotes-demo">
+    <InLine>
+      <AdSystem>Fieldnotes example</AdSystem>
+      <AdTitle>VAST sample creative</AdTitle>
+      <Description>Public Google IMA sample footage. Skip after five seconds.</Description>
+      <Impression/>
+      <Creatives>
+        <Creative id="sample-video">
+          <Linear skipoffset="00:00:05">
+            <Duration>00:01:00.070</Duration>
+            <MediaFiles>
+              <MediaFile delivery="progressive" type="video/mp4" width="854" height="480"><![CDATA[https://storage.googleapis.com/gvabox/media/samples/stock.mp4]]></MediaFile>
+            </MediaFiles>
+          </Linear>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>

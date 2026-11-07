@@ -8,6 +8,8 @@
 
 ## Features
 
+Want a complete application? The [Cloudflare Stream library example](https://github.com/karerckor/composable-video-player/tree/main/examples/cloudflare-stream) combines a Hono Worker with this player, a searchable catalogue, chapters, captions, a transcript and configurable branding. It is a standalone folder you can extract and deploy to your own Cloudflare account; the README includes local setup and deployment commands.
+
 - **Sources**: MP4/WebM/anything the browser plays, HLS via lazy-loaded hls.js (native HLS where MSE is missing), quality lists (`[720p]url,[1080p]url`), audio tracks (`{English}url;{French}url`), fallback chains (`a or b`), random alternatives (`a and b`), start offsets (`url[seek:30]`). See [Sources](03-sources.md).
 - **Typed API**: `player.command('seek', 30)`, `player.on('time', t => …)`, `player.state`, and `player.select(selector, cb)` for reactive state. See [API](04-api.md).
 - **PlayerJS-style API**: `player.api('seek', '+10')`, `PlayerjsEvents`, DOM events, and a `postMessage` bridge for iframes. See [PlayerJS compatibility](08-playerjs-compat.md).

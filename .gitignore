@@ -5,3 +5,13 @@ demo/assets/
 *.log
 .DS_Store
 /site/
+
+# Local launch drafts, design sources and personal publishing assets.
+/marketing/
+
+# Local credentials and Worker state; commit only empty example templates.
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler/

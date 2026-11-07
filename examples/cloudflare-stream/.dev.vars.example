@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local development with your own videos.
+# Demo mode works without credentials.
+CLOUDFLARE_ACCOUNT_ID=""
+CLOUDFLARE_STREAM_API_TOKEN=""

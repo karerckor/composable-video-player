@@ -30,6 +30,12 @@ The CSS is bundled and injected automatically.
 
 ## Examples
 
+**Deployable Cloudflare Stream library**
+
+[`examples/cloudflare-stream/`](examples/cloudflare-stream/) is a standalone Hono + Cloudflare Workers application with a searchable video catalogue, chapters, captions, clickable transcripts, timestamp sharing, remembered playback and configurable site/player themes. Its custom plugins demonstrate Share and opt-in VAST prerolls through Google IMA, with live events and source code on the page. Extract just that folder with gitpick, try the public Stream demo, then deploy it with your own videos. See its [setup guide](examples/cloudflare-stream/README.md).
+
+[Try the public video library](https://karerckor.github.io/composable-video-player/examples/stream-library/) · [Read the walkthrough](docs/guide/11-video-library.md)
+
 **Typed API (bundler)**
 
 ```ts

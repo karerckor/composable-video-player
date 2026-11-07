@@ -24,9 +24,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            examples/cloudflare-stream/package-lock.json
       - name: Install ffmpeg (demo media are generated, not committed)
         run: command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
       - run: npm ci
+      - run: npm ci --prefix examples/cloudflare-stream
+      - run: npm run test:site
       - run: npm run assets
       - run: npm run site
       - uses: actions/configure-pages@v5

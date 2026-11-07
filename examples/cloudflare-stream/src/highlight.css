@@ -1,0 +1,26 @@
+:root {
+  --syntax-keyword:#c9a6f7;
+  --syntax-string:#c3e88d;
+  --syntax-number:#f0b27c;
+  --syntax-comment:#93a18b;
+  --syntax-type:#8ed3e6;
+  --syntax-function:#a7c4ff;
+  --syntax-variable:#e5d9a8;
+}
+:root[data-scheme=light] {
+  --syntax-keyword:#7940a9;
+  --syntax-string:#3d6d30;
+  --syntax-number:#a04c17;
+  --syntax-comment:#697561;
+  --syntax-type:#146b7c;
+  --syntax-function:#285ca4;
+  --syntax-variable:#805c20;
+}
+.integration-code .hljs-keyword,.integration-code .hljs-selector-tag,.integration-code .hljs-literal { color:var(--syntax-keyword); }
+.integration-code .hljs-string,.integration-code .hljs-regexp { color:var(--syntax-string); }
+.integration-code .hljs-number { color:var(--syntax-number); }
+.integration-code .hljs-comment,.integration-code .hljs-quote { color:var(--syntax-comment); }
+.integration-code .hljs-type,.integration-code .hljs-built_in,.integration-code .hljs-title.class_ { color:var(--syntax-type); }
+.integration-code .hljs-title.function_,.integration-code .hljs-function .hljs-title { color:var(--syntax-function); }
+.integration-code .hljs-variable,.integration-code .hljs-symbol,.integration-code .hljs-meta { color:var(--syntax-variable); }
+.integration-code .hljs-property,.integration-code .hljs-attr { color:var(--text); }
